@@ -6,11 +6,14 @@ import sun.tools.attach.LinuxVirtualMachine;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.ProtectionDomain;
 import java.util.List;
 
 /**
@@ -44,9 +47,20 @@ public class TestAgent {
 
         System.out.println("run test agent");
         Instrumentation instrumentation = instrumentation();
+        doTransform(instrumentation);
+    }
+
+    private static void doTransform(Instrumentation instrumentation) {
         Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
         System.out.println("all load classes length:" + allLoadedClasses.length);
         System.out.println("object size:" + instrumentation.getObjectSize(new Object()));
+        instrumentation.addTransformer(new ClassFileTransformer() {
+            @Override
+            public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+                System.out.println("class transform " + className);
+                return classfileBuffer;
+            }
+        });
     }
 
     private String jarFilePath = "/home/fupan/IdeaProjects/agentTest/agent-jar/target/agent-jar-1.0-SNAPSHOT.jar";
