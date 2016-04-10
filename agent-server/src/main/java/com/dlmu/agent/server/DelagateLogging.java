@@ -1,6 +1,7 @@
 package com.dlmu.agent.server;
 
 import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
 import java.lang.reflect.Method;
 
@@ -16,7 +17,6 @@ public class DelagateLogging {
         System.out.println("logging begin.");
         return ret;
     }*/
-
 
     public static void logging(@Origin Method method) {
         System.out.println("logging");

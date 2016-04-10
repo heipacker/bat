@@ -1,10 +1,13 @@
 package com.dlmu.agent.server;
 
+import com.dlmu.agent.server.annotation.DTracer;
+
 /**
  * Created by fupan on 16-4-2.
  */
 public class HelloWorld {
 
+    @DTracer
     public void sayHello() {
         System.out.println("sayHello");
     }

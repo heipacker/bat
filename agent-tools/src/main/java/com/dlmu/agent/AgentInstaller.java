@@ -7,7 +7,7 @@ import java.lang.instrument.Instrumentation;
  */
 public class AgentInstaller {
 
-    private static Instrumentation instrumentation = null;
+    public static Instrumentation instrumentation = null;
 
     /**
      * 命令行启动

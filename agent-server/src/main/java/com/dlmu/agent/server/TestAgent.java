@@ -1,7 +1,6 @@
 package com.dlmu.agent.server;
 
-import com.dlmu.agent.AgentInstaller;
-import com.dlmu.agent.AgentSupport;
+import com.dlmu.agent.CosmosAgent;
 
 import java.lang.instrument.Instrumentation;
 
@@ -20,16 +19,11 @@ public class TestAgent {
      */
     public static void main(String[] args) {
         //程序启动时attach得把这个注释掉
-        attachAgent();
+        CosmosAgent.install();
 
         System.out.println("run test agent");
-        Instrumentation instrumentation = AgentSupport.getInstrumentation();
+        Instrumentation instrumentation = CosmosAgent.getInstrumentation();
         ClassTransformerSupport.addCode(instrumentation);
-    }
-
-    private static final String jarFilePath = "/home/fupan/IdeaProjects/agentTest/agent-tools/target/agent-tools-1.0-SNAPSHOT.jar";
-
-    private static void attachAgent() {
-        AgentSupport.loadAgent(jarFilePath);
+        new HelloWorld().sayHello();
     }
 }

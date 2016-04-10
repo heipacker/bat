@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Created by fupan on 16-4-9.
  */
+@Deprecated
 public class AgentSupport {
 
     public static Instrumentation getInstrumentation() {

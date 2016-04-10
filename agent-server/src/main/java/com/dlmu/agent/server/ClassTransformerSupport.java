@@ -1,14 +1,23 @@
 package com.dlmu.agent.server;
 
+import com.dlmu.agent.server.annotation.DTracer;
+import com.dlmu.agent.server.listener.AgentListener;
+import com.sun.tools.javac.jvm.Target;
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.ExceptionMethod;
+import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
  * Created by fupan on 16-4-9.
@@ -28,22 +37,25 @@ public class ClassTransformerSupport {
                 return logClassTransformer.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
             }
         });*/
-        ClassFileTransformer classFileTransformer = new AgentBuilder.Default().type(ElementMatchers.any()).transform(new AgentBuilder.Transformer() {
+       /* ClassFileTransformer classFileTransformer = new AgentBuilder.Default().type(ElementMatchers.any()).transform(new AgentBuilder.Transformer() {
             @Override
             public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader) {
                 return builder
-                        .method(ElementMatchers.any()).intercept(MethodDelegation.to(DelagateLogging.class)
-                                .andThen(SuperMethodCall.INSTANCE));
-            }
-        }).installOn(instrumentation);
-        /*ClassFileTransformer classFileTransformer = new AgentBuilder.Default().type(ElementMatchers.any()).transform(new AgentBuilder.Transformer() {
-            @Override
-            public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader) {
-                return builder
-                        .method(ElementMatchers.any()).intercept(MethodDelegation.to(LoggerInterceptor.class).andThen(SuperMethodCall.INSTANCE));
+                        .method(ElementMatchers.any())
+                        .intercept(MethodDelegation.to(DelagateLogging.class)
+                                .andThen(SuperMethodCall.INSTANCE
+                                        .andThen(MethodDelegation.to(DelagateLogging.class))));
             }
         }).installOn(instrumentation);*/
-        new HelloWorld().sayHello();
+        ClassFileTransformer classFileTransformer1 = new AgentBuilder.Default().type(nameStartsWith("com.dlmu")).transform(new AgentBuilder.Transformer() {
+            @Override
+            public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader) {
+                System.out.println("getCanonicalName:" + typeDescription.getCanonicalName());
+//                System.out.println("fullClassName:" + typeDescription.getPackage().getName() + "." + typeDescription.getSimpleName());
+                return builder.method(isAnnotatedWith(DTracer.class)).
+                        intercept((MethodDelegation.to(LoggerInterceptor.class)));
+            }
+        }).with(new AgentListener()).installOn(instrumentation);
     }
 
 }

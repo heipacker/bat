@@ -88,7 +88,7 @@ public class DubbyTest {
                 .getLoaded()
                 .newInstance()
                 .hello("World");
-        System.out.println("sourceDubbyTest:" + helloWorld);
+//        System.out.println("sourceDubbyTest:" + helloWorld);
     }
 
     public void agentBuilderTest() {
