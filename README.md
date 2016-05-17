@@ -6,3 +6,5 @@ java agent test project
 具体运行方法， 参考main函数的注释
 
 使用byte dubby 修改字节码， 添加执行过程拦截记录
+
+这里准备写一个跟踪链系统, 参考dapper
