@@ -1,4 +1,4 @@
-package com.dlmu.agent.server;
+package com.dlmu.agent.common.conf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

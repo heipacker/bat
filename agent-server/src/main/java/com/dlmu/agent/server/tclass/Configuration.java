@@ -1,7 +1,7 @@
 package com.dlmu.agent.server.tclass;
 
 import com.dlmu.agent.common.Constants;
-import com.dlmu.agent.server.DTraceConfiguration;
+import com.dlmu.agent.common.conf.DTraceConfiguration;
 import com.dlmu.agent.server.Utils;
 import com.dlmu.agent.server.transformer.DTraceGenerated;
 import org.objectweb.asm.Type;

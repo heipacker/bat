@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>agent-tools</module>
+        <module>agent-client</module>
         <module>agent-server</module>
         <module>agent-annotation</module>
         <module>agent-annotation-processor</module>
@@ -19,6 +20,7 @@
     <properties>
         <org.slf4j.version>1.7.5</org.slf4j.version>
         <logback.version>1.0.13</logback.version>
+        <jackson-core.version>2.6.5</jackson-core.version>
     </properties>
 
     <dependencyManagement>
@@ -110,6 +112,24 @@
                 <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-core.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
