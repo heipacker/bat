@@ -1,18 +1,11 @@
 package com.dlmu.agent.server;
 
-import com.dlmu.agent.server.annotation.DTracer;
+import com.dlmu.agent.annotation.DTrace;
 import com.dlmu.agent.server.listener.AgentListener;
-import com.sun.tools.javac.jvm.Target;
 import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.implementation.ExceptionMethod;
-import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.SuperMethodCall;
-import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
@@ -52,7 +45,7 @@ public class ClassTransformerSupport {
             public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader) {
                 System.out.println("getCanonicalName:" + typeDescription.getCanonicalName());
 //                System.out.println("fullClassName:" + typeDescription.getPackage().getName() + "." + typeDescription.getSimpleName());
-                return builder.method(isAnnotatedWith(DTracer.class)).
+                return builder.method(isAnnotatedWith(DTrace.class)).
                         intercept((MethodDelegation.to(LoggerInterceptor.class)));
             }
         }).with(new AgentListener()).installOn(instrumentation);
