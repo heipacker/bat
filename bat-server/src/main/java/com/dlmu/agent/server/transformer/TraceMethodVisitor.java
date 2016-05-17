@@ -14,28 +14,28 @@ class TraceMethodVisitor extends MethodVisitor implements Opcodes {
 
     private static final String TRACE_GENERATED_DESC = Type.getDescriptor(DTraceGenerated.class);
 
-    private static final String TRACEUTILS_INTERNALNAME = "qunar/tc/qtracer/TraceUtils";
+    private static final String TRACEUTILS_INTERNALNAME = "com/tc/qtracer/TraceUtils";
 
     private static final String STRINGBUILDER_INTERNALNAME = "java/lang/StringBuilder";
 
-    private static final String ADDKVANNOTATION_DESC = "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;Ljava/lang/Object;)V";
+    private static final String ADDKVANNOTATION_DESC = "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;Ljava/lang/Object;)V";
 
     private static final Map<String, String> ADDKVANNOTATION_DESC_MAP = new HashMap<String, String>();
 
     static {
-        ADDKVANNOTATION_DESC_MAP.put("Z", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;Z)V");
-        ADDKVANNOTATION_DESC_MAP.put("B", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;B)V");
-        ADDKVANNOTATION_DESC_MAP.put("C", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;C)V");
-        ADDKVANNOTATION_DESC_MAP.put("D", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;D)V");
-        ADDKVANNOTATION_DESC_MAP.put("F", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;F)V");
-        ADDKVANNOTATION_DESC_MAP.put("I", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;I)V");
-        ADDKVANNOTATION_DESC_MAP.put("J", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;J)V");
-        ADDKVANNOTATION_DESC_MAP.put("S", "(Lqunar/tc/qtracer/QTraceScope;Ljava/lang/String;S)V");
+        ADDKVANNOTATION_DESC_MAP.put("Z", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;Z)V");
+        ADDKVANNOTATION_DESC_MAP.put("B", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;B)V");
+        ADDKVANNOTATION_DESC_MAP.put("C", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;C)V");
+        ADDKVANNOTATION_DESC_MAP.put("D", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;D)V");
+        ADDKVANNOTATION_DESC_MAP.put("F", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;F)V");
+        ADDKVANNOTATION_DESC_MAP.put("I", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;I)V");
+        ADDKVANNOTATION_DESC_MAP.put("J", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;J)V");
+        ADDKVANNOTATION_DESC_MAP.put("S", "(Lcom/tc/qtracer/QTraceScope;Ljava/lang/String;S)V");
     }
 
     private static final String APPEND_NAME = "append";
 
-    private static final String QTRACE_SCOPE_INTERNALNAME = "qunar/tc/qtracer/QTraceScope";
+    private static final String QTRACE_SCOPE_INTERNALNAME = "com/tc/qtracer/QTraceScope";
 
     private final TraceMethod method;
 
@@ -248,11 +248,11 @@ class TraceMethodVisitor extends MethodVisitor implements Opcodes {
 
     private void startTrace(int scopeVarIndex) {
         //QTraceClient client = QTraceClientGetter.getClient();
-        traceMethod.visitMethodInsn(INVOKESTATIC, "qunar/tc/qtracer/impl/QTraceClientGetter", "getClient", "()Lqunar/tc/qtracer/QTraceClient;", false);
+        traceMethod.visitMethodInsn(INVOKESTATIC, "com/tc/qtracer/impl/QTraceClientGetter", "getClient", "()Lcom/tc/qtracer/QTraceClient;", false);
         //QTraceScope scope = client.startTrace(method.getSignature());
         traceMethod.visitLdcInsn(method.getDescription());
-        traceMethod.visitFieldInsn(GETSTATIC, TRACEUTILS_INTERNALNAME, "NEW_NO_TRACE", "Lqunar/tc/qtracer/TraceInfo;");
-        traceMethod.visitMethodInsn(INVOKEINTERFACE, "qunar/tc/qtracer/QTraceClient", "startTrace", "(Ljava/lang/String;Lqunar/tc/qtracer/TraceInfo;)Lqunar/tc/qtracer/QTraceScope;", true);
+        traceMethod.visitFieldInsn(GETSTATIC, TRACEUTILS_INTERNALNAME, "NEW_NO_TRACE", "Lcom/tc/qtracer/TraceInfo;");
+        traceMethod.visitMethodInsn(INVOKEINTERFACE, "com/tc/qtracer/QTraceClient", "startTrace", "(Ljava/lang/String;Lcom/tc/qtracer/TraceInfo;)Lcom/tc/qtracer/QTraceScope;", true);
         //store scope to local variable
         traceMethod.visitVarInsn(ASTORE, scopeVarIndex);
 

@@ -19,7 +19,7 @@ public class TestAgent {
     private static final Logger logger = LoggerFactory.getLogger(TestAgent.class);
     /**
      * 第一个种， 程序启动是attach
-     * VM options: -javaagent:/home/fupan/IdeaProjects/agentTest/agent-tools/target/agent-tools-1.0-SNAPSHOT.jar
+     * VM options: -javaagent:/home/fupan/IdeaProjects/bat/bat-tools/target/bat-tools-1.0-SNAPSHOT.jar
      * 第二种， 程序启动后attach
      * attachAgent();
      *

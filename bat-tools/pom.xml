@@ -3,14 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>agent</artifactId>
+        <artifactId>bat</artifactId>
         <groupId>com.dlmu</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>agent-tools</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>bat-tools</artifactId>
 
     <properties>
         <maven-jar-plugin.Premain-Class>com.dlmu.agent.AgentInstaller</maven-jar-plugin.Premain-Class>

@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>agent</artifactId>
+        <artifactId>bat</artifactId>
         <groupId>com.dlmu</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>agent-annotation-processor</artifactId>
+    <artifactId>bat-annotation-processor</artifactId>
 
     <build>
         <plugins>
@@ -30,11 +30,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>agent-annotation</artifactId>
+            <artifactId>bat-annotation</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>agent-common</artifactId>
+            <artifactId>bat-common</artifactId>
         </dependency>
     </dependencies>
 </project>

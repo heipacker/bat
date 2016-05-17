@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>agent</artifactId>
+        <artifactId>bat</artifactId>
         <groupId>com.dlmu</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>agent-client</artifactId>
+    <artifactId>bat-client</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>agent-common</artifactId>
+            <artifactId>bat-common</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -56,4 +56,19 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
