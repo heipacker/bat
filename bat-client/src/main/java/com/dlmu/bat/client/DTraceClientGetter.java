@@ -6,8 +6,7 @@ package com.dlmu.bat.client;
 public class DTraceClientGetter {
 
     public static DTraceClient getClient() {
-        return null;
+        return new DTraceClient();
     }
-
 
 }

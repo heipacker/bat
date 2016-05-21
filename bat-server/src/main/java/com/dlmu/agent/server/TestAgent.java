@@ -24,6 +24,6 @@ public class TestAgent {
         System.out.println("run test agent");
         Instrumentation instrumentation = CosmosAgent.getInstrumentation();
         ClassTransformerSupport.addCode(instrumentation);
-        new HelloWorld().sayHello();
+        new TestService().sayHello();
     }
 }

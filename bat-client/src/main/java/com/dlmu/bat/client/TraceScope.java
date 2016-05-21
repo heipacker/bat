@@ -125,7 +125,7 @@ public class TraceScope implements Closeable {
 
     @Override
     public String toString() {
-        return "TraceScope(tracerId=" + dTraceClient.getTracerId() +
+        return "TraceScope(tracerId=" + "traceId" +
                 ", span=" + span.toJson() +
                 ", detached=" + detached + ")";
     }

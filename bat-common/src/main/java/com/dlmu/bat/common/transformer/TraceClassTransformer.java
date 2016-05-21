@@ -12,7 +12,8 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 
 /**
- * @author heipacker on 16-5-15.
+ * @author heipacker
+ * @date 2016-5-15
  */
 public class TraceClassTransformer implements ClassFileTransformer {
 
@@ -44,19 +45,26 @@ public class TraceClassTransformer implements ClassFileTransformer {
             traceClassReader.accept(traceClassVisitor, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
             byte[] toByteArray = traceClassWriter.toByteArray();
-            writeToFile(toByteArray);
+            writeClassFileByteToFileSystem(toByteArray);
             return toByteArray;
         }
         return classfileBuffer;
     }
 
-    private static void writeToFile(byte[] toByteArray) {
+    /**
+     * todo remove this
+     *
+     * @param toByteArray
+     */
+    private static void writeClassFileByteToFileSystem(byte[] toByteArray) {
         File targetFile = new File("/home/heipacker/test.class");
         if (!targetFile.exists()) {
             try {
-                targetFile.createNewFile();
+                if (!targetFile.createNewFile()) {
+                    throw new RuntimeException("create " + targetFile.getAbsolutePath() + " file failed");
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("create file {} failed", targetFile.getAbsolutePath(), e);
             }
         }
         BufferedOutputStream bufferedOutputStream = null;
@@ -64,14 +72,14 @@ public class TraceClassTransformer implements ClassFileTransformer {
             bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(targetFile));
             bufferedOutputStream.write(toByteArray);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("write data to file {} failed", targetFile.getAbsolutePath(), e);
         } finally {
             try {
                 if (bufferedOutputStream != null) {
                     bufferedOutputStream.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("close file {} failed", targetFile.getAbsolutePath(), e);
             }
         }
 

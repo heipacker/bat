@@ -62,12 +62,12 @@ final class TraceClassVisitor extends ClassVisitor implements Opcodes {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        TraceMethod method = traceClass.getMethod(name, desc, protectionDomain);
-        if (method == null) {
+        TraceMethod traceMethod = traceClass.getMethod(name, desc, protectionDomain);
+        if (traceMethod == null) {
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
 
-        logger.info("instrument method: {}-{}", className, name);
-        return new TraceMethodVisitor(access, desc, signature, exceptions, className, method, cv);
+        logger.info("instrument method: {}.{}", className, name);
+        return new TraceMethodVisitor(access, desc, signature, exceptions, className, traceMethod, cv);
     }
 }

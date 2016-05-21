@@ -1,7 +1,7 @@
 package com.dlmu.test.asm;
 
 import com.dlmu.agent.CosmosAgent;
-import com.dlmu.agent.server.HelloWorld;
+import com.dlmu.agent.server.TestService;
 import com.dlmu.bat.common.tclass.Configuration;
 import com.dlmu.bat.common.transformer.TraceClassTransformer;
 import org.slf4j.Logger;
@@ -35,6 +35,6 @@ public class TestAgent {
             return;
         }
         instrumentation.addTransformer(new TraceClassTransformer(configuration));
-        new HelloWorld().sayHello();
+        new TestService().sayHello();
     }
 }

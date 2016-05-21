@@ -23,14 +23,14 @@ public class DTraceClient implements Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(DTraceClient.class);
 
-    private DTraceClient(String tracerId, TracerPool tracerPool, Sampler[] curSamplers) {
-        this.tracerId = tracerId;
-        this.tracerPool = tracerPool;
+    public DTraceClient() {
         this.threadContext = new DTraceClient.ThreadLocalContext();
         this.nullScope = new NullScope(this);
-        this.curSamplers = curSamplers;
     }
 
+    public String getNewTraceId() {
+        return "";
+    }
 
     /**
      * The thread-specific context for this Tracer.
@@ -97,11 +97,6 @@ public class DTraceClient implements Closeable {
     private static final SpanId EMPTY_PARENT_ARRAY[] = new SpanId[0];
 
     /**
-     * The tracerId.
-     */
-    private final String tracerId;
-
-    /**
      * The TracerPool which this Tracer belongs to.
      * <p>
      * This gets set to null after the Tracer is closed in order to catch some
@@ -139,64 +134,55 @@ public class DTraceClient implements Closeable {
         throw new RuntimeException(str);
     }
 
-    /**
-     * @return If the current thread is tracing, this function returns the Tracer that is
-     * being used; otherwise, it returns null.
-     */
-    public static DTraceClient curThreadTracer() {
-        TraceScope traceScope = threadLocalScope.get();
-        if (traceScope == null) {
-            return null;
-        }
-        return traceScope.dTraceClient;
-    }
-
     private TraceScope newScopeImpl(DTraceClient.ThreadContext context, String description) {
-        Span span = new MilliSpan.Builder().
-                tracerId(tracerId).
-                begin(System.currentTimeMillis()).
-                description(description).
-                parents(EMPTY_PARENT_ARRAY).
-                spanId(SpanId.fromRandom()).
-                build();
-        return context.pushNewScope(this, span, null);
+        return newScopeImpl(context, description, (TraceScope) null);
     }
 
     private TraceScope newScopeImpl(DTraceClient.ThreadContext context, String description,
                                     TraceScope parentScope) {
-        SpanId parentId = parentScope.getSpan().getSpanId();
+        SpanId[] parentSpanIds;
+        SpanId spanId;
+        if (parentScope != null) {
+            SpanId parentId = parentScope.getSpan().getSpanId();
+            parentSpanIds = new SpanId[]{parentId};
+            spanId = parentId.newChildId();
+        } else {
+            parentSpanIds = EMPTY_PARENT_ARRAY;
+            spanId = SpanId.fromRandom();
+        }
         Span span = new MilliSpan.Builder().
-                tracerId(tracerId).
+                tracerId("").
                 begin(System.currentTimeMillis()).
                 description(description).
-                parents(new SpanId[]{parentId}).
-                spanId(parentId.newChildId()).
+                parents(parentSpanIds).
+                spanId(spanId).
                 build();
         return context.pushNewScope(this, span, parentScope);
     }
 
     private TraceScope newScopeImpl(DTraceClient.ThreadContext context, String description,
                                     SpanId parentId) {
-        Span span = new MilliSpan.Builder().
-                tracerId(tracerId).
-                begin(System.currentTimeMillis()).
-                description(description).
-                parents(new SpanId[]{parentId}).
-                spanId(parentId.newChildId()).
-                build();
-        return context.pushNewScope(this, span, null);
+        return newScopeImpl(context, description, null, parentId);
     }
 
     private TraceScope newScopeImpl(DTraceClient.ThreadContext context, String description,
                                     TraceScope parentScope, SpanId secondParentId) {
-        SpanId parentId = parentScope.getSpan().getSpanId();
-        Span span = new MilliSpan.Builder().
-                tracerId(tracerId).
-                begin(System.currentTimeMillis()).
-                description(description).
-                parents(new SpanId[]{parentId, secondParentId}).
-                spanId(parentId.newChildId()).
-                build();
+        SpanId parentId;
+        MilliSpan.Builder builder = new MilliSpan.Builder();
+        if (parentScope != null) {
+            builder.tracerId(parentScope.getSpan().getTracerId());
+        } else {
+            builder.tracerId(getNewTraceId());
+        }
+        builder.begin(System.currentTimeMillis()).description(description);
+        if (parentScope != null) {
+            parentId = parentScope.getSpan().getSpanId();
+            builder.parents(new SpanId[]{parentId, secondParentId});
+        } else {
+            parentId = secondParentId;
+            builder.parents(new SpanId[]{parentId});
+        }
+        Span span = builder.spanId(parentId.newChildId()).build();
         return context.pushNewScope(this, span, parentScope);
     }
 
@@ -318,10 +304,21 @@ public class DTraceClient implements Closeable {
         return new TraceRunnable(this, parentScope, runnable, description);
     }
 
+    /**
+     * wrapper executorService
+     * @param impl
+     * @return
+     */
     public TraceExecutorService newTraceExecutorService(ExecutorService impl) {
         return newTraceExecutorService(impl, null);
     }
 
+    /**
+     *
+     * @param impl
+     * @param scopeName
+     * @return
+     */
     public TraceExecutorService newTraceExecutorService(ExecutorService impl,
                                                         String scopeName) {
         return new TraceExecutorService(this, scopeName, impl);
@@ -332,10 +329,6 @@ public class DTraceClient implements Closeable {
             throwClientError(toString() + " is closed.");
         }
         return tracerPool;
-    }
-
-    public String getTracerId() {
-        return tracerId;
     }
 
     /**
@@ -540,14 +533,5 @@ public class DTraceClient implements Closeable {
     @Override
     public boolean equals(Object other) {
         return (this == other);
-    }
-
-    @Override
-    public String toString() {
-        return "Tracer(" + tracerId + ")";
-    }
-
-    public static void main(String[] args) {
-        System.out.println(DTraceClient.class.getPackage().getName());
     }
 }
