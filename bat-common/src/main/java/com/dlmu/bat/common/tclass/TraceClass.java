@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 代表一个需要trace的类
+ */
 public class TraceClass {
 
     private final Map<String, Set<TraceMethod>> desc2Method;

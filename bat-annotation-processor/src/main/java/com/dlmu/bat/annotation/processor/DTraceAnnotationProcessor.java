@@ -21,6 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 处理DTrace注解的处理器
+ * 如果需要使用, 一定得把这个包引入
+ *
+ * @author heipacker
+ * @date 16-4-2
+ */
 @SupportedAnnotationTypes("com.dlmu.bat.annotation.DTrace")
 public class DTraceAnnotationProcessor extends AbstractProcessor {
 
@@ -43,7 +50,9 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
         Writer writer = null;
         try {
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(DTrace.class);
-            if (elements == null || elements.size() == 0) return false;
+            if (elements == null || elements.size() == 0) {
+                return false;
+            }
 
             FileObject resource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", Constants.DTRACER_CONFIG_FILE);
             writer = resource.openWriter();
@@ -70,7 +79,9 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
     }
 
     /**
-     * 类似这种格式：className:methodName(parameterType name):[desc=desc1:][type=type1][:args=arg1,arg2][:fields=filedName(fieldType)S|I]
+     * 类似这种格式：
+     * className:methodName(parameterType name):[desc=desc1:][type=type1][:args=arg1,arg2][:fields=filedName(fieldType)S|I]
+     * 例子：
      * com.mysql.jdbc.StatementImpl:executeQuery(java.lang.String originalSql):type=SQL:fields=currentCatalog(java.lang.String)I:args=originalSql
      *
      * @param element
@@ -78,9 +89,13 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
      */
     private String generateTraceConfig(ExecutableElement element) {
         DTrace annotation = element.getAnnotation(DTrace.class);
-        if (annotation == null) return null;
+        if (annotation == null) {
+            return null;
+        }
         Element enclosingElement = element.getEnclosingElement();
-        if (enclosingElement.getKind() != ElementKind.CLASS) return null;
+        if (enclosingElement.getKind() != ElementKind.CLASS) {
+            return null;
+        }
 
         StringBuilder result = new StringBuilder();
         result.append(((TypeElement) enclosingElement).getQualifiedName().toString());
@@ -110,7 +125,7 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
             result.append(TYPE_PREFIX).append(annotation.type()).append(':');
         }
 
-        //如果一个QP都没标，则trace所有参数
+        //如果一个DP都没标，则trace所有参数
         if (traceArgs.size() > 0) {
             result.append(ARGS_PREFIX).append(join(traceArgs)).append(":");
         } else if (allArgNames.size() > 0) {
@@ -151,7 +166,7 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
     }
 
     /**
-     * 提取QF注解的字段
+     * 提取DF注解的字段
      * @param typeElement
      * @return
      */

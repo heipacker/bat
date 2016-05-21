@@ -170,17 +170,28 @@ public class Configuration {
 
     private boolean needSkip(Method method) {
         int modifiers = method.getModifiers();
-        if (Modifier.isAbstract(modifiers)) return true;
-        if (Modifier.isNative(modifiers)) return true;
-        if (method.isBridge()) return true;
-        if (method.isSynthetic()) return true;
-        if (exist(method, DTraceGenerated.class)) return true;
+        if (Modifier.isAbstract(modifiers)) {
+            return true;
+        }
+        if (Modifier.isNative(modifiers)) {
+            return true;
+        }
+        if (method.isBridge()) {
+            return true;
+        }
+        if (method.isSynthetic()) {
+            return true;
+        }
+        if (exist(method, DTraceGenerated.class)) {
+            return true;
+        }
         return false;
     }
 
     private boolean match(Method method, String methodName) {
-        if (methodName == null || methodName.length() == 0) return true;
-
+        if (methodName == null || methodName.length() == 0) {
+            return true;
+        }
         return method.getName().equals(methodName);
     }
 

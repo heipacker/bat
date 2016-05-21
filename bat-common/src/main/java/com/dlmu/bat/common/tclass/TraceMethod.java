@@ -10,7 +10,7 @@ import java.util.*;
 public class TraceMethod {
     private static final Logger logger = LoggerFactory.getLogger(TraceMethod.class);
 
-    private String type = "QTRACE";
+    private String type = "DTRACE";
 
     private String name;
     private List<TraceArg> args;

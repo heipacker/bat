@@ -8,23 +8,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 轮询实现。
- * 
+ *
  * @author heipacker
  */
 public class RoundRobinLoadBalance<T> extends AbstractLoadBalance<T> {
-	
-	private NaturalNumberAtomicCounter sequence  = new NaturalNumberAtomicCounter();
-	
-	@Override
-	protected T doSelect(List<?> sources, InvokerContext context) {
-		int index = sequence.getAndIncrement() % sources.size();
-		return (T)sources.get(index);
-	}
+
+    private NaturalNumberAtomicCounter sequence = new NaturalNumberAtomicCounter();
+
+    @Override
+    protected T doSelect(List<?> sources, InvokerContext context) {
+        int index = sequence.getAndIncrement() % sources.size();
+        return (T) sources.get(index);
+    }
 }
 
 /**
  * 自然数(0,1,2...)原子计数器。
- * 
+ *
  * @author heipacker
  */
 class NaturalNumberAtomicCounter {
@@ -45,6 +45,6 @@ class NaturalNumberAtomicCounter {
 
     public int intValue() {
         return atom.intValue();
-    } 
-	
+    }
+
 }

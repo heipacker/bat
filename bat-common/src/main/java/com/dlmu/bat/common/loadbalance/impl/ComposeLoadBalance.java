@@ -7,7 +7,6 @@ import com.dlmu.bat.common.loadbalance.LoadBalance;
 import java.util.List;
 
 /**
- * 不搞单独的策略多路了，通过继承实现多路。
  *
  * @author heipacker
  */
