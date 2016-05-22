@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>bat-tools</module>
+        <module>bat-agent</module>
         <module>bat-client</module>
         <module>bat-server</module>
         <module>bat-annotation</module>
@@ -43,7 +43,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>bat-tools</artifactId>
+                <artifactId>bat-agent</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -141,6 +141,24 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yammer.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>2.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>19.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sf.jopt-simple</groupId>
+                <artifactId>jopt-simple</artifactId>
+                <version>5.0.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

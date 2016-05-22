@@ -18,16 +18,23 @@ package com.dlmu.bat.client.receiver;
 
 import com.dlmu.bat.client.Span;
 import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.common.metric.Metrics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.common.base.Stopwatch;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -126,58 +133,63 @@ public class LocalFileSpanReceiver extends SpanReceiver {
 
     @Override
     public void receiveSpan(Span span) {
-        // Serialize the span data into a byte[].  Note that we're not holding the
-        // lock here, to improve concurrency.
-        byte jsonBuf[] = null;
+        TimerContext context = Metrics.newTimer("receiveSpanTimer", TimeUnit.MILLISECONDS, TimeUnit.MILLISECONDS, Collections.<String, String>emptyMap()).time();
         try {
-            jsonBuf = JSON_WRITER.writeValueAsBytes(span);
-        } catch (JsonProcessingException e) {
-            logger.error("receiveSpan(path=" + path + ", span=" + span + "): " +
-                    "Json processing error: " + e.getMessage());
-            return;
-        }
-
-        // Grab the bufferLock and put our jsonBuf into the list of buffers to
-        // flush.
-        byte toFlush[][] = null;
-        bufferLock.lock();
-        try {
-            if (bufferedSpans == null) {
-                logger.debug("receiveSpan(path=" + path + ", span=" + span + "): " +
-                        "LocalFileSpanReceiver for " + path + " is closed.");
+            // Serialize the span data into a byte[].  Note that we're not holding the
+            // lock here, to improve concurrency.
+            byte jsonBuf[] = null;
+            try {
+                jsonBuf = JSON_WRITER.writeValueAsBytes(span);
+            } catch (JsonProcessingException e) {
+                logger.error("receiveSpan(path=" + path + ", span=" + span + "): " +
+                        "Json processing error: " + e.getMessage());
                 return;
             }
-            bufferedSpans[bufferedSpansIndex] = jsonBuf;
-            bufferedSpansIndex++;
-            if (bufferedSpansIndex == bufferedSpans.length) {
-                // If we've hit the limit for the number of buffers to flush,
-                // swap out the existing bufferedSpans array for a new array, and
-                // prepare to flush those spans to disk.
-                toFlush = bufferedSpans;
-                bufferedSpansIndex = 0;
-                bufferedSpans = new byte[bufferedSpans.length][];
+
+            // Grab the bufferLock and put our jsonBuf into the list of buffers to
+            // flush.
+            byte toFlush[][] = null;
+            bufferLock.lock();
+            try {
+                if (bufferedSpans == null) {
+                    logger.debug("receiveSpan(path=" + path + ", span=" + span + "): " +
+                            "LocalFileSpanReceiver for " + path + " is closed.");
+                    return;
+                }
+                bufferedSpans[bufferedSpansIndex] = jsonBuf;
+                bufferedSpansIndex++;
+                if (bufferedSpansIndex == bufferedSpans.length) {
+                    // If we've hit the limit for the number of buffers to flush,
+                    // swap out the existing bufferedSpans array for a new array, and
+                    // prepare to flush those spans to disk.
+                    toFlush = bufferedSpans;
+                    bufferedSpansIndex = 0;
+                    bufferedSpans = new byte[bufferedSpans.length][];
+                }
+            } finally {
+                bufferLock.unlock();
+            }
+            if (toFlush != null) {
+                // We released the bufferLock above, to avoid blocking concurrent
+                // receiveSpan calls.  But now, we must take the channelLock, to make
+                // sure that we have sole access to the output channel.  If we did not do
+                // this, we might get interleaved output.
+                //
+                // There is a small chance that another thread doing a flush of more
+                // recent spans could get ahead of us here, and take the lock before we
+                // do.  This is ok, since spans don't have to be written out in order.
+                channelLock.lock();
+                try {
+                    doFlush(toFlush, toFlush.length);
+                } catch (IOException ioe) {
+                    logger.error("Error flushing buffers to " + path + ": " +
+                            ioe.getMessage());
+                } finally {
+                    channelLock.unlock();
+                }
             }
         } finally {
-            bufferLock.unlock();
-        }
-        if (toFlush != null) {
-            // We released the bufferLock above, to avoid blocking concurrent
-            // receiveSpan calls.  But now, we must take the channelLock, to make
-            // sure that we have sole access to the output channel.  If we did not do
-            // this, we might get interleaved output.
-            //
-            // There is a small chance that another thread doing a flush of more
-            // recent spans could get ahead of us here, and take the lock before we
-            // do.  This is ok, since spans don't have to be written out in order.
-            channelLock.lock();
-            try {
-                doFlush(toFlush, toFlush.length);
-            } catch (IOException ioe) {
-                logger.error("Error flushing buffers to " + path + ": " +
-                        ioe.getMessage());
-            } finally {
-                channelLock.unlock();
-            }
+            context.stop();
         }
     }
 
