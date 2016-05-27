@@ -13,7 +13,7 @@ public class DTraceClientGetter {
     private static final Supplier<DTraceClient> instance = Suppliers.memoize(new Supplier<DTraceClient>() {
         @Override
         public DTraceClient get() {
-            return new DTraceClient(DTraceConfiguration.fromMap(System.getenv()));
+            return new DefaultDTraceClient(DTraceConfiguration.fromMap(System.getenv()));
         }
     });
 

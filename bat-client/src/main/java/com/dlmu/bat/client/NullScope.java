@@ -35,7 +35,7 @@ class NullScope extends DefaultTraceScope {
     @Override
     public void detach() {
         if (detached) {
-            DTraceClient.throwClientError("Can't detach this DefaultTraceScope  because " +
+            DefaultDTraceClient.throwClientError("Can't detach this DefaultTraceScope  because " +
                     "it is already detached.");
         }
         detached = true;
@@ -44,7 +44,7 @@ class NullScope extends DefaultTraceScope {
     @Override
     public void reattach() {
         if (!detached) {
-            DTraceClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
+            DefaultDTraceClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
                     "it is not detached.");
         }
         detached = false;

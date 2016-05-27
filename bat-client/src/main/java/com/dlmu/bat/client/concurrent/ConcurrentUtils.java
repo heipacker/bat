@@ -1,10 +1,9 @@
 package com.dlmu.bat.client.concurrent;
 
-import com.dlmu.bat.client.*;
+import com.dlmu.bat.client.DefaultTraceStatus;
+import com.dlmu.bat.client.Span;
+import com.dlmu.bat.client.TraceStatus;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
@@ -25,7 +24,7 @@ public class ConcurrentUtils {
      *                    is no description.
      * @return The callable provided, wrapped if tracing, 'callable' if not.
      */
-    public <V> Callable<V> wrap(Callable<V> callable, String description) {
+    public static <V> Callable<V> wrap(Callable<V> callable, String description) {
         Span parentSpan = traceStatus.getCurrentSpan();
         if (parentSpan == null) {
             return callable;
@@ -41,7 +40,7 @@ public class ConcurrentUtils {
      *                    no description.
      * @return The runnable provided, wrapped if tracing, 'runnable' if not.
      */
-    public Runnable wrap(Runnable runnable, String description) {
+    public static Runnable wrap(Runnable runnable, String description) {
         Span parentSpan = traceStatus.getCurrentSpan();
         if (parentSpan == null) {
             return runnable;
@@ -55,7 +54,7 @@ public class ConcurrentUtils {
      * @param impl
      * @return
      */
-    public TraceExecutorService newTraceExecutorService(ExecutorService impl) {
+    public static TraceExecutorService newTraceExecutorService(ExecutorService impl) {
         return newTraceExecutorService(impl, null);
     }
 
@@ -64,9 +63,9 @@ public class ConcurrentUtils {
      * @param scopeName
      * @return
      */
-    public TraceExecutorService newTraceExecutorService(ExecutorService impl,
-                                                        String scopeName) {
-        return new TraceExecutorService(DTraceClientGetter.getClient(), scopeName, impl);
+    public static TraceExecutorService newTraceExecutorService(ExecutorService impl,
+                                                               String scopeName) {
+        return new TraceExecutorService(scopeName, impl);
     }
 
 }
