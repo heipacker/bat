@@ -17,6 +17,8 @@
 package com.dlmu.bat.client;
 
 import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.common.tname.Utils;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +29,14 @@ import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.dlmu.bat.common.conf.ConfigConstants.DEFAULT_TRACER_ID;
+import static com.dlmu.bat.common.conf.ConfigConstants.TRACER_ID_KEY;
 
 /**
  * <p>The HTrace dTraceClient ID.</p>
@@ -57,22 +64,40 @@ import java.util.TreeSet;
 public final class TracerId {
     private static final Logger logger = LoggerFactory.getLogger(TracerId.class);
 
-    /**
-     * The configuration key to use for process id
-     */
-    public static final String TRACER_ID_KEY = "dTraceClient.id";
+    private static final int[] codex = {2, 3, 5, 6, 8, 9, 19, 11, 12, 14, 15, 17, 18};
+    private static final AtomicInteger messageOrder = new AtomicInteger(0);
 
     /**
-     * The default dTraceClient ID to use if no other ID is configured.
+     * 默认自动生成traceId
+     *
+     * @param conf
+     * @param sample
+     * @return
      */
-    private static final String DEFAULT_TRACER_ID = "%{tname}/%{ip}";
+    public static String next(DTraceConfiguration conf, Sample sample) {
+        if (conf != null) {
+            String fmt = conf.get(TRACER_ID_KEY);
+            if (!Strings.isNullOrEmpty(fmt)) {
+                return next(conf);
+            }
+        }
+        StringBuilder sb = new StringBuilder(40);
+        long time = System.currentTimeMillis();
+        String ts = new Timestamp(time).toString();
 
-    private final String tracerName;
+        for (int idx : codex)
+            sb.append(ts.charAt(idx));
+        sb.append('.').append(getBestIpString());
+        sb.append('.').append(getOsPid());
+        sb.append('.').append(messageOrder.getAndIncrement()); //可能为负数.但是无所谓.
+        return Utils.getTName() + '_' + sb.toString() + "_" + sample.getSuffix();
+    }
 
-    private final String tracerId;
-
-    public TracerId(DTraceConfiguration conf, String tracerName) {
-        this.tracerName = tracerName;
+    /**
+     * @param conf
+     * @return
+     */
+    public static String next(DTraceConfiguration conf) {
         String fmt = conf.get(TRACER_ID_KEY, DEFAULT_TRACER_ID);
         StringBuilder bld = new StringBuilder();
         StringBuilder varBld = null;
@@ -130,16 +155,17 @@ public final class TracerId {
             logger.warn("Unterminated process ID substitution variable at the end " +
                     "of format string " + fmt);
         }
-        this.tracerId = bld.toString();
+        String traceId = bld.toString();
         if (logger.isTraceEnabled()) {
             logger.trace("ProcessID(fmt=" + fmt + "): computed process ID of \"" +
-                    this.tracerId + "\"");
+                    traceId + "\"");
         }
+        return traceId;
     }
 
-    private String processShellVar(String var) {
-        if (var.equals("tname")) {
-            return tracerName;
+    private static String processShellVar(String var) {
+        if (var.equals("tname")) {//将appName修改为traceName 抽象一下
+            return Utils.getTName();
         } else if (var.equals("pname")) {
             return getProcessName();
         } else if (var.equals("ip")) {
@@ -287,9 +313,5 @@ public final class TracerId {
                     "of the managed bean for the JVM.", e);
             return 0L;
         }
-    }
-
-    public String get() {
-        return tracerId;
     }
 }

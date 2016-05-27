@@ -17,6 +17,7 @@
 package com.dlmu.bat.client.receiver;
 
 import com.dlmu.bat.client.Span;
+import com.dlmu.bat.common.BaseSpan;
 import com.dlmu.bat.common.conf.DTraceConfiguration;
 
 import java.io.IOException;
@@ -28,16 +29,16 @@ import java.util.HashSet;
  * receives. The spans it receives can be accessed with getSpans();
  */
 public class POJOSpanReceiver extends SpanReceiver {
-    private final Collection<Span> spans;
+    private final Collection<BaseSpan> spans;
 
     public POJOSpanReceiver(DTraceConfiguration conf) {
-        this.spans = new HashSet<Span>();
+        this.spans = new HashSet<BaseSpan>();
     }
 
     /**
      * @return The spans this POJOSpanReceiver has received.
      */
-    public Collection<Span> getSpans() {
+    public Collection<BaseSpan> getSpans() {
         return spans;
     }
 
@@ -46,7 +47,7 @@ public class POJOSpanReceiver extends SpanReceiver {
     }
 
     @Override
-    public void receiveSpan(Span span) {
+    public void receiveSpan(BaseSpan span) {
         spans.add(span);
     }
 }

@@ -1,6 +1,6 @@
 package com.dlmu.bat.client;
 
-import com.dlmu.bat.common.transformer.Constants;
+import com.dlmu.bat.common.Constants;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

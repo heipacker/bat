@@ -17,43 +17,55 @@
 package com.dlmu.bat.client.concurrent;
 
 import com.dlmu.bat.client.DTraceClient;
-import com.dlmu.bat.client.SpanId;
+import com.dlmu.bat.client.DTraceClientGetter;
 import com.dlmu.bat.client.TraceScope;
+
+import java.util.Map;
 
 /**
  * Wrap a Runnable with a Span that survives a change in threads.
  */
 public class TraceRunnable implements Runnable {
-    private final DTraceClient dTraceClient;
-    private final SpanId parentId;
-    private final Runnable runnable;
-    private final String description;
 
-    /**
-     * @deprecated Use {@link #TraceRunnable(DTraceClient, SpanId, Runnable, String)} instead.
-     */
-    @Deprecated
-    public TraceRunnable(DTraceClient dTraceClient, TraceScope parent,
-                         Runnable runnable, String description) {
-        this(dTraceClient, parent.getSpanId(), runnable, description);
+    private String description;
+    private String traceId;
+    private String spanId;
+    private Map<String, String> traceContext;
+    private Runnable runnable;
+
+    public TraceRunnable(String traceId, String spanId, Map<String, String> traceContext,
+                         Runnable runnable) {
+        this.traceId = traceId;
+        this.spanId = spanId;
+        this.traceContext = traceContext;
+        this.runnable = runnable;
     }
 
-    public TraceRunnable(DTraceClient dTraceClient, SpanId parentId,
-                         Runnable runnable, String description) {
-        this.dTraceClient = dTraceClient;
-        this.parentId = parentId;
+    public TraceRunnable(String description, String traceId, String spanId, Map<String, String> traceContext,
+                         Runnable runnable) {
+        this.traceId = traceId;
+        this.spanId = spanId;
+        this.traceContext = traceContext;
         this.runnable = runnable;
         this.description = description;
     }
 
     @Override
     public void run() {
-        String description = this.description;
-        if (description == null) {
-            description = Thread.currentThread().getName();
-        }
-        try (TraceScope chunk = dTraceClient.newScope(description, parentId)) {
+        if (traceId == null) {
             runnable.run();
+        } else {
+            String description = this.description;
+            if (description == null) {
+                description = Thread.currentThread().getName();
+            }
+            DTraceClient dTraceClient = DTraceClientGetter.getClient();
+            TraceScope traceScope = dTraceClient.newScope(description, traceId, spanId, traceContext);
+            try {
+                runnable.run();
+            } finally {
+                traceScope.close();
+            }
         }
     }
 

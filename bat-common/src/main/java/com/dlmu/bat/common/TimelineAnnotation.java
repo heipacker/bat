@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dlmu.bat.client;
+package com.dlmu.bat.common;
 
 public class TimelineAnnotation {
     private final long time;

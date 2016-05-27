@@ -17,40 +17,52 @@
 package com.dlmu.bat.client.concurrent;
 
 import com.dlmu.bat.client.DTraceClient;
-import com.dlmu.bat.client.SpanId;
+import com.dlmu.bat.client.DTraceClientGetter;
 import com.dlmu.bat.client.TraceScope;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
  * Wrap a Callable with a Span that survives a change in threads.
  */
 public class TraceCallable<V> implements Callable<V> {
-    private final DTraceClient dTraceClient;
-    private final Callable<V> impl;
-    private final SpanId parentId;
-    private final String description;
 
-    public TraceCallable(DTraceClient dTraceClient, SpanId parentId, Callable<V> impl,
-                         String description) {
-        this.dTraceClient = dTraceClient;
-        this.impl = impl;
-        this.parentId = parentId;
+    private String description;
+    private String traceId;
+    private String spanId;
+    private Map<String, String> traceContext;
+    private final Callable<V> callable;
+
+    public TraceCallable(String description, String traceId, String spanId, Map<String, String> traceContext,
+                         Callable<V> callable) {
+        this.traceId = traceId;
+        this.spanId = spanId;
+        this.traceContext = traceContext;
+        this.callable = callable;
         this.description = description;
     }
 
     @Override
     public V call() throws Exception {
-        String description = this.description;
-        if (description == null) {
-            description = Thread.currentThread().getName();
-        }
-        try (TraceScope chunk = dTraceClient.newScope(description, parentId)) {
-            return impl.call();
+        if (traceId == null) {
+            return callable.call();
+        } else {
+            String description = this.description;
+            if (description == null) {
+                description = Thread.currentThread().getName();
+            }
+            DTraceClient dTraceClient = DTraceClientGetter.getClient();
+            TraceScope traceScope = dTraceClient.newScope(description, traceId, spanId, traceContext);
+            try {
+                return callable.call();
+            } finally {
+                traceScope.close();
+            }
         }
     }
 
     public Callable<V> getImpl() {
-        return impl;
+        return callable;
     }
 }

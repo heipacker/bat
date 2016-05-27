@@ -17,6 +17,7 @@
 package com.dlmu.bat.client.receiver;
 
 import com.dlmu.bat.client.Span;
+import com.dlmu.bat.common.BaseSpan;
 import com.dlmu.bat.common.conf.DTraceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,5 +170,5 @@ public abstract class SpanReceiver implements Closeable {
      *
      * @param span The span to store with this SpanReceiver.
      */
-    public abstract void receiveSpan(Span span);
+    public abstract void receiveSpan(BaseSpan span);
 }

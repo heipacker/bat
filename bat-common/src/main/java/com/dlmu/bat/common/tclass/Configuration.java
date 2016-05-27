@@ -1,6 +1,6 @@
 package com.dlmu.bat.common.tclass;
 
-import com.dlmu.bat.common.Utils;
+import com.dlmu.bat.common.tname.Utils;
 import com.dlmu.bat.common.transformer.DTraceGenerated;
 import com.dlmu.bat.common.Constants;
 import com.dlmu.bat.common.conf.DTraceConfiguration;
@@ -109,7 +109,7 @@ public class Configuration {
 
     public boolean isInstrument() {
         boolean defaultSwitch = conf.getBoolean("default", false);
-        return getBoolean(Utils.getAppName(), defaultSwitch);
+        return getBoolean(Utils.getTName(), defaultSwitch);
     }
 
     private boolean getBoolean(String name, boolean def) {

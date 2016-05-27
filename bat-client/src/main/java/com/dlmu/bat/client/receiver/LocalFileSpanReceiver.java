@@ -16,15 +16,12 @@
  */
 package com.dlmu.bat.client.receiver;
 
-import com.dlmu.bat.client.Span;
+import com.dlmu.bat.common.BaseSpan;
 import com.dlmu.bat.common.conf.DTraceConfiguration;
 import com.dlmu.bat.common.metric.Metrics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.common.base.Stopwatch;
-import com.google.common.util.concurrent.TimeLimiter;
-import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +129,7 @@ public class LocalFileSpanReceiver extends SpanReceiver {
     }
 
     @Override
-    public void receiveSpan(Span span) {
+    public void receiveSpan(BaseSpan span) {
         TimerContext context = Metrics.newTimer("receiveSpanTimer", TimeUnit.MILLISECONDS, TimeUnit.MILLISECONDS, Collections.<String, String>emptyMap()).time();
         try {
             // Serialize the span data into a byte[].  Note that we're not holding the

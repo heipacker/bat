@@ -16,23 +16,26 @@
  */
 package com.dlmu.bat.client;
 
+import com.dlmu.bat.common.Constants;
+
 /**
- * An empty {@link TraceScope}.
+ * An empty {@link DefaultTraceScope}.
  */
-class NullScope extends TraceScope {
+class NullScope extends DefaultTraceScope {
+
     NullScope(DTraceClient dTraceClient) {
         super(dTraceClient, null, null);
     }
 
     @Override
-    public SpanId getSpanId() {
-        return SpanId.INVALID;
+    public String getSpanId() {
+        return Constants.ROOT_SPANID;
     }
 
     @Override
     public void detach() {
         if (detached) {
-            DTraceClient.throwClientError("Can't detach this TraceScope  because " +
+            DTraceClient.throwClientError("Can't detach this DefaultTraceScope  because " +
                     "it is already detached.");
         }
         detached = true;
@@ -41,7 +44,7 @@ class NullScope extends TraceScope {
     @Override
     public void reattach() {
         if (!detached) {
-            DTraceClient.throwClientError("Can't reattach this TraceScope  because " +
+            DTraceClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
                     "it is not detached.");
         }
         detached = false;
@@ -49,7 +52,7 @@ class NullScope extends TraceScope {
 
     @Override
     public void close() {
-        dTraceClient.popNullScope();
+
     }
 
     @Override

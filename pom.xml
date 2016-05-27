@@ -16,6 +16,7 @@
         <module>bat-annotation-processor</module>
         <module>bat-common</module>
         <module>bat-test</module>
+        <module>bat-plugin</module>
     </modules>
 
     <properties>
@@ -54,6 +55,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bat-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bat-plugin</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -159,6 +165,18 @@
                 <groupId>net.sf.jopt-simple</groupId>
                 <artifactId>jopt-simple</artifactId>
                 <version>5.0.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.0.36.Final</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>3.1.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

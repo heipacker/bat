@@ -23,7 +23,7 @@ public class TraceInfo {
 
     @Override
     public String toString() {
-        return "TraceInfo(traceId=" + traceId + ", spanId=" + spanId + ")";
+        return "TraceInfo(traceId=" + traceId + ", spanId=" + spanId + ", traceContext=" + traceContext + ")";
     }
 
 }

@@ -16,10 +16,13 @@
  */
 package com.dlmu.bat.client;
 
+import com.dlmu.bat.common.TimelineAnnotation;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,7 +37,6 @@ import java.util.Map;
  * possible to keep following the parents of a span until you arrive at a
  * span with no parents.</p>
  */
-@JsonSerialize(using = Span.SpanSerializer.class)
 public interface Span {
     /**
      * The block has completed, stop the clock
@@ -83,36 +85,16 @@ public interface Span {
      * @return The spanID.  This object is immutable and is safe to access
      * from multiple threads.
      */
-    SpanId getSpanId();
+    String getSpanId();
 
     /**
      * Create a child span of this span with the given description
      *
      * @return A new child span.
-     * @deprecated Since 4.0.0. Use {@link MilliSpan.Builder}
      */
-    @Deprecated
     Span child(String description);
 
-    @Override
-    String toString();
-
-    /**
-     * Returns the parent IDs of the span.
-     *
-     * @return The array of parents, or an empty array if there are no parents.
-     */
-    SpanId[] getParents();
-
-    /**
-     * Set the parents of this span.
-     * <p>
-     * <p>Any existing parents will be cleared by this call.</p>
-     *
-     * @param parents The parents to set.
-     */
-    void setParents(SpanId[] parents);
-
+    String getChildNextId();
     /**
      * Add a data annotation associated with this span
      *
@@ -145,77 +127,21 @@ public interface Span {
      */
     List<TimelineAnnotation> getTimelineAnnotations();
 
+    void addTraceContext(String key, String value);
+
+    ImmutableMap<String, String> getTraceContext();
+
     /**
      * Return a unique id for the process from which this Span originated.
      *
      * @return The dTraceClient id.  Will never be null.
      */
-    String getTracerId();
+    String getTraceId();
 
     /**
      * Set the dTraceClient id of a span.
      *
      * @param s The dTraceClient ID to set.
      */
-    void setTracerId(String s);
-
-    /**
-     * Serialize to Json
-     *
-     * @return A JSON string with the span data.
-     */
-    String toJson();
-
-    public static class SpanSerializer extends JsonSerializer<Span> {
-        @Override
-        public void serialize(Span span, JsonGenerator jgen, SerializerProvider provider)
-                throws IOException {
-            jgen.writeStartObject();
-            if (span.getSpanId().isValid()) {
-                jgen.writeStringField("a", span.getSpanId().toString());
-            }
-            if (span.getStartTimeMillis() != 0) {
-                jgen.writeNumberField("b", span.getStartTimeMillis());
-            }
-            if (span.getStopTimeMillis() != 0) {
-                jgen.writeNumberField("e", span.getStopTimeMillis());
-            }
-            if (!span.getDescription().isEmpty()) {
-                jgen.writeStringField("d", span.getDescription());
-            }
-            String tracerId = span.getTracerId();
-            if (!tracerId.isEmpty()) {
-                jgen.writeStringField("r", tracerId);
-            }
-            jgen.writeArrayFieldStart("p");
-            for (SpanId parent : span.getParents()) {
-                jgen.writeString(parent.toString());
-            }
-            jgen.writeEndArray();
-            Map<String, String> traceInfoMap = span.getKVAnnotations();
-            if (!traceInfoMap.isEmpty()) {
-                jgen.writeObjectFieldStart("n");
-                String[] keys = traceInfoMap.keySet().
-                        toArray(new String[traceInfoMap.size()]);
-                Arrays.sort(keys);
-                for (String key : keys) {
-                    jgen.writeStringField(key, traceInfoMap.get(key));
-                }
-                jgen.writeEndObject();
-            }
-            List<TimelineAnnotation> timelineAnnotations =
-                    span.getTimelineAnnotations();
-            if (!timelineAnnotations.isEmpty()) {
-                jgen.writeArrayFieldStart("t");
-                for (TimelineAnnotation tl : timelineAnnotations) {
-                    jgen.writeStartObject();
-                    jgen.writeNumberField("t", tl.getTime());
-                    jgen.writeStringField("m", tl.getMessage());
-                    jgen.writeEndObject();
-                }
-                jgen.writeEndArray();
-            }
-            jgen.writeEndObject();
-        }
-    }
+    void setTraceId(String s);
 }

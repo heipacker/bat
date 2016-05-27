@@ -79,6 +79,10 @@
             <groupId>net.sf.jopt-simple</groupId>
             <artifactId>jopt-simple</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
