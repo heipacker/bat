@@ -1,6 +1,5 @@
 package com.dlmu.bat.store.impl;
 
-import com.dlmu.bat.common.Serializers;
 import com.dlmu.bat.common.TraceIdWrapper;
 import com.dlmu.bat.common.metric.Metrics;
 import com.dlmu.bat.store.StoreService;
@@ -30,20 +29,37 @@ public class HBaseStoreServiceImpl implements StoreService<HBaseBaseSpan> {
 
     private HBaseClient hBaseClient;
 
-    protected byte[] table;
+    private byte[] table;
 
-    public final byte[] FAMILY = ascii2byte("b");
+    private byte[] family = ascii2byte("b");
 
+    /**
+     *
+     * @param hBaseClient
+     * @param table
+     */
     public HBaseStoreServiceImpl(HBaseClient hBaseClient, String table) {
         this.hBaseClient = hBaseClient;
         this.table = table.getBytes(Charsets.UTF_8);
+    }
+
+    /**
+     *
+     * @param hBaseClient
+     * @param table
+     * @param family
+     */
+    public HBaseStoreServiceImpl(HBaseClient hBaseClient, String table, String family) {
+        this.hBaseClient = hBaseClient;
+        this.table = table.getBytes(Charsets.UTF_8);
+        this.family = ascii2byte(family);
     }
 
     @Override
     public void storeSpan(HBaseBaseSpan baseSpan) {
         byte[] rowKey = ascii2byte(baseSpan.rowKey());
         byte[] qualifier = ascii2byte(baseSpan.qualifier());
-        PutRequest put = new PutRequest(table, rowKey, FAMILY, qualifier, baseSpan.toBytes());
+        PutRequest put = new PutRequest(table, rowKey, family, qualifier, baseSpan.toBytes());
         put.setDurable(false);//todo 可以修改 视情况而定
 
         final TimerContext context = Metrics.newTimer("storeSpanTimer", ImmutableMap.of("", "")).time();
@@ -69,7 +85,7 @@ public class HBaseStoreServiceImpl implements StoreService<HBaseBaseSpan> {
     public Deferred<List<HBaseBaseSpan>> getChildrenSpans(final String traceId, final String parentSpanId) {
         TraceIdWrapper traceIdWrapper = TraceIdWrapper.parseTraceId(traceId);
         byte[] rowKey = ascii2byte(traceIdWrapper.rowKey());
-        GetRequest getRequest = new GetRequest(table, rowKey, FAMILY);
+        GetRequest getRequest = new GetRequest(table, rowKey, family);
         Deferred<List<HBaseBaseSpan>> deferred = hBaseClient.get(getRequest).addBoth(new Callback<List<HBaseBaseSpan>, ArrayList<KeyValue>>() {
             @Override
             public List<HBaseBaseSpan> call(ArrayList<KeyValue> arg) throws Exception {
@@ -124,5 +140,29 @@ public class HBaseStoreServiceImpl implements StoreService<HBaseBaseSpan> {
             result[i] = (byte) value.charAt(i);
         }
         return result;
+    }
+
+    public HBaseClient gethBaseClient() {
+        return hBaseClient;
+    }
+
+    public void sethBaseClient(HBaseClient hBaseClient) {
+        this.hBaseClient = hBaseClient;
+    }
+
+    public byte[] getTable() {
+        return table;
+    }
+
+    public void setTable(byte[] table) {
+        this.table = table;
+    }
+
+    public byte[] getFamily() {
+        return family;
+    }
+
+    public void setFamily(byte[] family) {
+        this.family = family;
     }
 }

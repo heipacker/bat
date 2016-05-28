@@ -1,5 +1,7 @@
 package com.dlmu.bat.store.impl;
 
+import com.dlmu.bat.common.TraceIdWrapper;
+
 /**
  * @author heipacker
  * @date 16-5-28.
@@ -7,7 +9,7 @@ package com.dlmu.bat.store.impl;
 public class TraceIdUtils {
 
     public static String rowKey(String traceId) {
-        return null;
+        return TraceIdWrapper.parseTraceId(traceId).rowKey();
     }
 
 }
