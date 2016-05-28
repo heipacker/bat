@@ -13,4 +13,4 @@ java agent test project
 2016/05/21 可以简单的插桩了
 
 2016/05/27 trace初步可以了
-
+执行TestAgent中的main来测试
