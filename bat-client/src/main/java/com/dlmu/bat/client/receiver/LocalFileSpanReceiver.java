@@ -132,7 +132,7 @@ public class LocalFileSpanReceiver extends SpanReceiver {
 
     @Override
     public void receiveSpan(BaseSpan span) {
-        TimerContext context = Metrics.newTimer("receiveSpanTimer", TimeUnit.MILLISECONDS, TimeUnit.MILLISECONDS, Collections.<String, String>emptyMap()).time();
+        TimerContext context = Metrics.newTimer("receiveSpanTimer", Collections.<String, String>emptyMap()).time();
         try {
             // Serialize the span data into a byte[].  Note that we're not holding the
             // lock here, to improve concurrency.

@@ -1,10 +1,13 @@
 package com.dlmu.bat.store.impl;
 
 import com.dlmu.bat.common.BaseSpan;
+import com.google.common.base.Charsets;
 
 import java.io.IOException;
 
 /**
+ * 添加rowkey方法
+ * qualifer
  * @author heipacker
  * @date 16-5-28.
  */
@@ -14,8 +17,15 @@ public class HBaseBaseSpan extends BaseSpan {
         super(sources);
     }
 
-    public byte[] toRowKey() {
+    public String rowKey() {
+        return TraceIdUtils.rowKey(traceId);
+    }
+    
+    public String qualifier() {
+        return spanId;
+    }
 
-        return null;
+    public byte[] toBytes() {
+        return new byte[0];
     }
 }

@@ -149,4 +149,59 @@ public class BaseSpan implements InvokerContext {
         return traceId;
     }
 
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    public String getSpanId() {
+        return spanId;
+    }
+
+    public void setSpanId(String spanId) {
+        this.spanId = spanId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public long getStart() {
+        return start;
+    }
+
+    public void setStart(long start) {
+        this.start = start;
+    }
+
+    public long getStop() {
+        return stop;
+    }
+
+    public void setStop(long stop) {
+        this.stop = stop;
+    }
+
+    public Map<String, String> getTraceInfo() {
+        return traceInfo;
+    }
+
+    public void setTraceInfo(Map<String, String> traceInfo) {
+        this.traceInfo = traceInfo;
+    }
+
+    public List<TimelineAnnotation> getTimeline() {
+        return timeline;
+    }
+
+    public void setTimeline(List<TimelineAnnotation> timeline) {
+        this.timeline = timeline;
+    }
 }

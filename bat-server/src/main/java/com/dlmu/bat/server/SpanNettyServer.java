@@ -12,7 +12,6 @@ import org.apache.zookeeper.Watcher;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Span Netty服务器。
@@ -99,7 +98,7 @@ public class SpanNettyServer extends NettyServer {
 
     @Override
     protected void postProcessDecode(int readableBytes, String remoteInfo) {
-        Metrics.newMeter("dtracer.spanDecodeSuccess", "", TimeUnit.MILLISECONDS, Collections.<String, String>emptyMap()).mark();
+        Metrics.newMeter("dtracer.spanDecodeSuccess", "", Collections.<String, String>emptyMap()).mark();
     }
 
     @Override

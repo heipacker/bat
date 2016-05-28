@@ -57,15 +57,6 @@ public class Serializers {
         return value.getBytes(Charsets.UTF_8);
     }
 
-    public static byte[] ascii2byte(String value) {
-        int len = value.length();
-        byte[] result = new byte[len];
-        for (int i = 0; i < len; ++i) {
-            result[i] = (byte) value.charAt(i);
-        }
-        return result;
-    }
-
     public static void writeUTF8String(String value, DataOutputStream output) throws IOException {
         if (value == null) {
             output.writeBoolean(false);

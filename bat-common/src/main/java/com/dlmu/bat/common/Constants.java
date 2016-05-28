@@ -12,6 +12,12 @@ public class Constants {
 
     public static final String SERVER_ROOT = "/battrace/server/root";
 
+    public static final String BAT_TRACE_UNIQUE_SPLITTER_STR = ".";
+
+    public static final String BAT_TRACE_SPLITTER_STR = "_";
+
+    public static final char BAT_TRACE_SPLITTER_CHAR = '_';
+
     //日志文件里显示的信息
     public static final String MDC_KEY = "BATTRACER";
     public static final String TRACE_ID_IN_LOG = "BatTraceId";
@@ -31,7 +37,6 @@ public class Constants {
     public static final String TRACE_STATUS_ERROR = "ERROR";
 
     public static final String NO_NEW_TRACEID = "NO_NEW_TRACEID";
-
 
     //traceInfo
     public static final String BAT_TRACE_TNAME = "tname";

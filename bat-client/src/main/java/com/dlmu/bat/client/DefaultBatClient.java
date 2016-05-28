@@ -139,7 +139,7 @@ class DefaultBatClient implements BatClient {
 
     private TraceScope newRootScope(String description) {
         Sample sample = getSample(null);
-        String traceId = TracerId.next(configuration, sample);
+        String traceId = TraceId.next(sample);
         MilliSpan span = new MilliSpan(description, traceId, Constants.ROOT_SPANID);
         traceStatus.setCurrentSpan(span);
         return new DefaultTraceScope(this, span, null);
@@ -270,7 +270,6 @@ class DefaultBatClient implements BatClient {
      * Get the hash code of a Tracer object.
      * <p>
      * This hash code is based on object identity.
-     * This is used in TracerPool to create a hash table of Tracers.
      */
     @Override
     public int hashCode() {
@@ -281,7 +280,6 @@ class DefaultBatClient implements BatClient {
      * Compare two batClient objects.
      * <p>
      * Tracer objects are always compared by object equality.
-     * This is used in TracerPool to create a hash table of Tracers.
      */
     @Override
     public boolean equals(Object other) {

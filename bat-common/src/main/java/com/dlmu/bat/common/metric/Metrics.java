@@ -102,26 +102,35 @@ public class Metrics {
     }
 
     /**
+     *
      * @param name
-     * @param metric
      * @param tags
      * @param <T>
      * @return
      */
-    public static <T> Gauge<T> newGauge(String name, Gauge<T> metric, Map<String, String> tags) {
-        return com.yammer.metrics.Metrics.defaultRegistry().newGauge(metricName(name, tags), metric);
+    public static <T> Counter newCounter(String name, Map<String, String> tags) {
+        return com.yammer.metrics.Metrics.defaultRegistry().newCounter(metricName(name, tags));
+    }
+    /**
+     * @param name
+     * @param gauge
+     * @param tags
+     * @param <T>
+     * @return
+     */
+    public static <T> Gauge<T> newGauge(String name, Gauge<T> gauge, Map<String, String> tags) {
+        return com.yammer.metrics.Metrics.defaultRegistry().newGauge(metricName(name, tags), gauge);
     }
 
     /**
      * @param name
      * @param eventType
-     * @param timeUnit
      * @param tags
      * @param <T>
      * @return
      */
-    public static <T> Meter newMeter(String name, String eventType, TimeUnit timeUnit, Map<String, String> tags) {
-        return com.yammer.metrics.Metrics.defaultRegistry().newMeter(metricName(name, tags), eventType, timeUnit);
+    public static <T> Meter newMeter(String name, String eventType, Map<String, String> tags) {
+        return com.yammer.metrics.Metrics.defaultRegistry().newMeter(metricName(name, tags), eventType, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -137,14 +146,12 @@ public class Metrics {
 
     /**
      * @param name
-     * @param durationUnit
-     * @param rateUnit
      * @param tags
      * @param <T>
      * @return
      */
-    public static <T> Timer newTimer(String name, TimeUnit durationUnit, TimeUnit rateUnit, Map<String, String> tags) {
-        return com.yammer.metrics.Metrics.defaultRegistry().newTimer(metricName(name, tags), durationUnit, rateUnit);
+    public static <T> Timer newTimer(String name, Map<String, String> tags) {
+        return com.yammer.metrics.Metrics.defaultRegistry().newTimer(metricName(name, tags), TimeUnit.MILLISECONDS, TimeUnit.MILLISECONDS);
     }
 
     /**

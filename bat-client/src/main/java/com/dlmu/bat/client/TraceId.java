@@ -16,6 +16,7 @@
  */
 package com.dlmu.bat.client;
 
+import com.dlmu.bat.common.Constants;
 import com.dlmu.bat.common.OSUtils;
 import com.dlmu.bat.common.tname.Utils;
 import com.dlmu.bat.plugin.conf.Configuration;
@@ -26,62 +27,41 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.dlmu.bat.common.Constants.BAT_TRACE_SPLITTER_STR;
+import static com.dlmu.bat.common.Constants.BAT_TRACE_UNIQUE_SPLITTER_STR;
 import static com.dlmu.bat.common.conf.ConfigConstants.DEFAULT_TRACER_ID;
 import static com.dlmu.bat.common.conf.ConfigConstants.TRACER_ID_KEY;
 
-/**
- * <p>The HTrace batClient ID.</p>
- * <p>
- * <p>HTrace batClient IDs are created from format strings.
- * Format strings contain variables which the TracerId class will
- * replace with the correct values at runtime.</p>
- * <p>
- * <ul>
- * <li>%{tname}: the batClient name supplied when creating the Tracer.</li>
- * <li>%{pname}: the process name obtained from the JVM.</li>
- * <li>%{ip}: will be replaced with an ip address.</li>
- * <li>%{pid}: the numerical process ID from the operating system.</li>
- * </ul>
- * <p>
- * <p>For example, the string "%{pname}/%{ip}" will be replaced with something
- * like: DataNode/192.168.0.1, assuming that the process' name is DataNode
- * and its IP address is 192.168.0.1.</p>
- * <p>
- * ID strings can contain backslashes as escapes.
- * For example, "\a" will map to "a".  "\%{ip}" will map to the literal
- * string "%{ip}", not the IP address.  A backslash itself can be escaped by a
- * preceding backslash.
- */
-public final class TracerId {
-    private static final Logger logger = LoggerFactory.getLogger(TracerId.class);
+public final class TraceId {
 
+    private static final Logger logger = LoggerFactory.getLogger(TraceId.class);
+
+    /**
+     * 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22
+     * 2 0 1 6 - 0 5 - 2 8    2  2  :  5  9  :  0  4  .  8  8  5
+     * 2016-05-28 22:59:04.885
+     */
     private static final int[] codex = {2, 3, 5, 6, 8, 9, 19, 11, 12, 14, 15, 17, 18};
-    private static final AtomicInteger messageOrder = new AtomicInteger(0);
+
+    private static final AtomicInteger sequence = new AtomicInteger(0);
 
     /**
      * 默认自动生成traceId
      *
-     * @param conf
      * @param sample
      * @return
      */
-    public static String next(Configuration conf, Sample sample) {
-        if (conf != null) {
-            String fmt = conf.get(TRACER_ID_KEY);
-            if (!Strings.isNullOrEmpty(fmt)) {
-                return next(conf);
-            }
-        }
+    public static String next(Sample sample) {
         StringBuilder sb = new StringBuilder(40);
-        long time = System.currentTimeMillis();
-        String ts = new Timestamp(time).toString();
+        String ts = new Timestamp(System.currentTimeMillis()).toString();
 
-        for (int idx : codex)
+        for (int idx : codex){
             sb.append(ts.charAt(idx));
-        sb.append('.').append(OSUtils.getBestIpString());
-        sb.append('.').append(OSUtils.getOsPid());
-        sb.append('.').append(messageOrder.getAndIncrement()); //可能为负数.但是无所谓.
-        return Utils.getTName() + '_' + sb.toString() + "_" + sample.getSuffix();
+        }
+        sb.append(BAT_TRACE_UNIQUE_SPLITTER_STR).append(OSUtils.getBestIpString());
+        sb.append(BAT_TRACE_UNIQUE_SPLITTER_STR).append(OSUtils.getOsPid());
+        sb.append(BAT_TRACE_UNIQUE_SPLITTER_STR).append(sequence.getAndIncrement()); //可能为负数, 无所谓.
+        return Utils.getTName() + BAT_TRACE_SPLITTER_STR + sb.toString() + BAT_TRACE_SPLITTER_STR + sample.getSuffix();
     }
 
     /**
