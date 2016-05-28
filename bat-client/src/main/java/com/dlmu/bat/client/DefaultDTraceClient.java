@@ -60,6 +60,13 @@ class DefaultDTraceClient implements DTraceClient {
                 }
             }
         }, true);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                close();
+            }
+        }));
     }
 
     /**

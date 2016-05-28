@@ -17,6 +17,7 @@
 package com.dlmu.bat.client.receiver;
 
 import com.dlmu.bat.common.BaseSpan;
+import com.dlmu.bat.common.OSUtils;
 import com.dlmu.bat.common.metric.Metrics;
 import com.dlmu.bat.plugin.conf.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,11 +27,12 @@ import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Collections;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -53,13 +55,13 @@ public class LocalFileSpanReceiver extends SpanReceiver {
     private final FileChannel channel;
     private final ReentrantLock channelLock = new ReentrantLock();
 
-    public LocalFileSpanReceiver(Configuration conf) {
-        int capacity = conf.getInt(CAPACITY_KEY, CAPACITY_DEFAULT);
+    public LocalFileSpanReceiver(Configuration configuration) {
+        int capacity = configuration.getInt(CAPACITY_KEY, CAPACITY_DEFAULT);
         if (capacity < 1) {
             throw new IllegalArgumentException(CAPACITY_KEY + " must not be " +
                     "less than 1.");
         }
-        String pathStr = conf.get(PATH_KEY);
+        String pathStr = configuration.get(PATH_KEY);
         if (pathStr == null || pathStr.isEmpty()) {
             path = getUniqueLocalTraceFileName();
         } else {
@@ -223,36 +225,18 @@ public class LocalFileSpanReceiver extends SpanReceiver {
         }
     }
 
-    public static String getUniqueLocalTraceFileName() {
-        String tmp = System.getProperty("java.io.tmpdir", "/tmp");
-        String nonce = null;
-        BufferedReader reader = null;
-        try {
-            // On Linux we can get a unique local file name by reading the process id
-            // out of /proc/self/stat.  (There isn't any portable way to get the
-            // process ID from Java.)
-            reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream("/proc/self/stat"),
-                            "UTF-8"));
-            String line = reader.readLine();
-            if (line == null) {
-                throw new EOFException();
-            }
-            nonce = line.split(" ")[0];
-        } catch (IOException e) {
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    logger.warn("Exception in closing " + reader, e);
-                }
+    private String getUniqueLocalTraceFileName() {
+        String logDir = null;
+        String basePath = System.getProperty("catalina.base");
+        if (basePath != null) {
+            File logDirFile = new File(basePath, "logs");
+            if (logDirFile.exists()) {
+                logDir = logDirFile.getAbsolutePath();
             }
         }
-        if (nonce == null) {
-            // If we can't use the process ID, use a random nonce.
-            nonce = UUID.randomUUID().toString();
+        if (logDir == null || !logDir.isEmpty()) {
+            logDir = System.getProperty("java.io.tmpdir", "/tmp");
         }
-        return new File(tmp, nonce).getAbsolutePath();
+        return new File(logDir, OSUtils.getOsPid() + ".trace.log").getAbsolutePath();
     }
 }

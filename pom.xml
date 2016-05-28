@@ -86,15 +86,12 @@
                 <scope>test</scope>
             </dependency>
 
-
             <!-- logging -->
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${org.slf4j.version}</version>
             </dependency>
-
             <!--Java Commons Logging redirect to slf4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -102,7 +99,6 @@
                 <version>${org.slf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
-
             <!--Apache log4j redirect to slf4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -177,6 +173,12 @@
                 <groupId>com.101tec</groupId>
                 <artifactId>zkclient</artifactId>
                 <version>0.8</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

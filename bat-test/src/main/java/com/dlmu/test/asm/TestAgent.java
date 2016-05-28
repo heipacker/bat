@@ -38,6 +38,5 @@ public class TestAgent {
         }
         instrumentation.addTransformer(new TraceClassTransformer(configuration));
         new TestService().sayHello();
-        DTraceClientGetter.getClient().close();
     }
 }
