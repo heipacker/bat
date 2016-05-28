@@ -15,8 +15,9 @@
         <module>bat-annotation</module>
         <module>bat-annotation-processor</module>
         <module>bat-common</module>
-        <module>bat-test</module>
+        <module>bat-store</module>
         <module>bat-plugin</module>
+        <module>bat-test</module>
     </modules>
 
     <properties>
@@ -60,6 +61,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bat-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bat-store</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

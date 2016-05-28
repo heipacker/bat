@@ -29,12 +29,16 @@ public class BaseSpan implements InvokerContext {
         MDC.put(Constants.MDC_KEY, Constants.TRACE_ID_IN_LOG + "[" + traceId + "]-" + Constants.SPAN_ID_IN_LOG + "[" + spanId + "]");
     }
 
+    public BaseSpan(byte[] sources) {
+        //todo 添加反序列化
+    }
+
     @Override
     public String id() {
         return traceId;
     }
 
     public void write(OutputStream os) {
-
+        //TODO 添加序列化
     }
 }
