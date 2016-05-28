@@ -7,8 +7,11 @@ import com.dlmu.bat.common.netty.NettyServer;
 import com.dlmu.bat.plugin.conf.Configuration;
 import com.dlmu.bat.store.StoreService;
 import com.dlmu.bat.store.impl.HBaseStoreServiceImpl;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import org.I0Itec.zkclient.ZkClient;
+import org.hbase.async.HBaseClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +56,15 @@ public class BatServer {
             boolean canStartup = isStartingUp.compareAndSet(false, true);
             if (canStartup) {
                 ZkClient zkClient = new ZkClient(configuration.get(ConfigConstants.ZK_ADDRESS_KEY, ConfigConstants.DEFAULT_ZK_ADDRESS));
-                storeService = new HBaseStoreServiceImpl();
+                String hbaseZkAddress = configuration.get(ConfigConstants.HBASE_ZK_ADDRESS_KEY);
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(hbaseZkAddress));
+                String hbasePath = configuration.get(ConfigConstants.HBASE_ZK_PATH_KEY);
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(hbasePath));
+                HBaseClient hBaseClient = new HBaseClient(hbaseZkAddress, hbasePath);
+                String batTable = configuration.get(ConfigConstants.HBASE_BAT_TRACE_TABLE_KEY);
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(batTable));
+
+                storeService = new HBaseStoreServiceImpl(hBaseClient, batTable);
                 NettyServer.Processor processor = new NettyServer.DecoderProcess<BaseSpan>(new Deserializer<BaseSpan>() {
                     @Override
                     public BaseSpan deserialize(byte[] sources) throws Exception {

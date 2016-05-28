@@ -43,6 +43,11 @@
             <artifactId>guava</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.hbase</groupId>
+            <artifactId>asynchbase</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

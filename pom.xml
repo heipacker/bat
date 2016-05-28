@@ -206,6 +206,13 @@
                 <version>3.2.2</version>
             </dependency>
 
+            <!-- http://mvnrepository.com/artifact/org.hbase/asynchbase -->
+            <dependency>
+                <groupId>org.hbase</groupId>
+                <artifactId>asynchbase</artifactId>
+                <version>1.7.1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
