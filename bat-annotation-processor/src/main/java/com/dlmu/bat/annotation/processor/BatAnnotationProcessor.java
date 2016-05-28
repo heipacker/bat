@@ -2,7 +2,7 @@ package com.dlmu.bat.annotation.processor;
 
 import com.dlmu.bat.annotation.DF;
 import com.dlmu.bat.annotation.DP;
-import com.dlmu.bat.annotation.DTrace;
+import com.dlmu.bat.annotation.BatTrace;
 import com.dlmu.bat.common.Constants;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 处理DTrace注解的处理器
+ * 处理BatTrace注解的处理器
  * 如果需要使用, 一定得把这个包引入
  *
  * @author heipacker
  * @date 16-4-2
  */
-@SupportedAnnotationTypes("com.dlmu.bat.annotation.DTrace")
-public class DTraceAnnotationProcessor extends AbstractProcessor {
+@SupportedAnnotationTypes("com.dlmu.bat.annotation.BatTrace")
+public class BatAnnotationProcessor extends AbstractProcessor {
 
     private static final char STATIC_FIELD_DESC = 'S';
 
@@ -49,12 +49,12 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Writer writer = null;
         try {
-            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(DTrace.class);
+            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(BatTrace.class);
             if (elements == null || elements.size() == 0) {
                 return false;
             }
 
-            FileObject resource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", Constants.DTRACER_CONFIG_FILE);
+            FileObject resource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", Constants.BAT_TRACER_CONFIG_FILE);
             writer = resource.openWriter();
 
             for (Element element : elements) {
@@ -88,7 +88,7 @@ public class DTraceAnnotationProcessor extends AbstractProcessor {
      * @return
      */
     private String generateTraceConfig(ExecutableElement element) {
-        DTrace annotation = element.getAnnotation(DTrace.class);
+        BatTrace annotation = element.getAnnotation(BatTrace.class);
         if (annotation == null) {
             return null;
         }

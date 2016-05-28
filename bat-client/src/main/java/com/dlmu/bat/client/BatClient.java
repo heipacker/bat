@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author heipacker on 16-5-18.
  */
-public interface DTraceClient extends Closeable {
+public interface BatClient extends Closeable {
 
     TraceScope newScope(String description, String traceId, String spanId, Map<String, String> traceContext);
 

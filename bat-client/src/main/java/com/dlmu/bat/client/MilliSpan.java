@@ -50,9 +50,9 @@ public class MilliSpan extends BaseSpan implements Span {
         this.traceContext = traceContext;
         this.start = currentTimeMillis();
         this.stop = 0;
-        addKVAnnotation(Constants.DTRACE_TNAME, Utils.getTName());
-        addKVAnnotation(Constants.DTRACE_LOCAL_HOSTADDRESS, NetUtil.getLocalAddress().getHostAddress());
-        addKVAnnotation(Constants.DTRACE_LOCAL_HOSTNAME, NetUtil.getLocalAddress().getHostName());
+        addKVAnnotation(Constants.BAT_TRACE_TNAME, Utils.getTName());
+        addKVAnnotation(Constants.BAT_TRACE_LOCAL_HOSTADDRESS, NetUtil.getLocalAddress().getHostAddress());
+        addKVAnnotation(Constants.BAT_TRACE_LOCAL_HOSTNAME, NetUtil.getLocalAddress().getHostName());
     }
 
 

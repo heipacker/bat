@@ -1,6 +1,6 @@
 package com.dlmu.bat.server.agent;
 
-import com.dlmu.bat.annotation.DTrace;
+import com.dlmu.bat.annotation.BatTrace;
 import com.dlmu.bat.server.agent.listener.AgentListener;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
@@ -46,7 +46,7 @@ public class ClassTransformerSupport {
             public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader) {
                 System.out.println("getCanonicalName:" + typeDescription.getCanonicalName());
 //                System.out.println("fullClassName:" + typeDescription.getPackage().getName() + "." + typeDescription.getSimpleName());
-                return builder.method(isAnnotatedWith(DTrace.class)).
+                return builder.method(isAnnotatedWith(BatTrace.class)).
                         intercept((MethodDelegation.to(LoggerInterceptor.class)));
             }
         }).with(new AgentListener()).installOn(instrumentation);

@@ -21,9 +21,9 @@ import java.util.Map;
 /**
  * @author heipacker on 16-5-18.
  */
-class DefaultDTraceClient implements DTraceClient {
+class DefaultBatClient implements BatClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultDTraceClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultBatClient.class);
 
     private static final TraceStatus traceStatus = DefaultTraceStatus.getInstance();
 
@@ -39,7 +39,7 @@ class DefaultDTraceClient implements DTraceClient {
      */
     private volatile Sampler curSampler;
 
-    DefaultDTraceClient(Configuration configuration) {
+    DefaultBatClient(Configuration configuration) {
         this.configuration = configuration;
         this.spanReceiver = loadReceiverType(this.configuration, null);
         this.configuration.addListener(new Configuration.ConfigurationListener() {
@@ -53,7 +53,7 @@ class DefaultDTraceClient implements DTraceClient {
                 Preconditions.checkNotNull(configSamplerClass);
                 try {
                     Constructor<?> configSamplerClassConstructor = configSamplerClass.getConstructor(Configuration.class);
-                    curSampler = (Sampler) configSamplerClassConstructor.newInstance(DefaultDTraceClient.this.configuration);
+                    curSampler = (Sampler) configSamplerClassConstructor.newInstance(DefaultBatClient.this.configuration);
                 } catch (Exception e) {
                     logger.error("get constructor error", e);
                     throw Throwables.propagate(e);
@@ -278,7 +278,7 @@ class DefaultDTraceClient implements DTraceClient {
     }
 
     /**
-     * Compare two dTraceClient objects.
+     * Compare two batClient objects.
      * <p>
      * Tracer objects are always compared by object equality.
      * This is used in TracerPool to create a hash table of Tracers.

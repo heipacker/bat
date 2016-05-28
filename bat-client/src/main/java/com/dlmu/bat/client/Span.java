@@ -128,14 +128,14 @@ public interface Span {
     /**
      * Return a unique id for the process from which this Span originated.
      *
-     * @return The dTraceClient id.  Will never be null.
+     * @return The batClient id.  Will never be null.
      */
     String getTraceId();
 
     /**
-     * Set the dTraceClient id of a span.
+     * Set the batClient id of a span.
      *
-     * @param s The dTraceClient ID to set.
+     * @param s The batClient ID to set.
      */
     void setTraceId(String s);
 }

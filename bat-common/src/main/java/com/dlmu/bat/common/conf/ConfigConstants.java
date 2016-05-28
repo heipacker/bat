@@ -8,9 +8,9 @@ public class ConfigConstants {
     /**
      * The configuration key to use for process id
      */
-    public static final String TRACER_ID_KEY = "dTraceClient.id";
+    public static final String TRACER_ID_KEY = "batClient.id";
     /**
-     * The default dTraceClient ID to use if no other ID is configured.
+     * The default batClient ID to use if no other ID is configured.
      */
     public static final String DEFAULT_TRACER_ID = "%{tname}/%{ip}";
 

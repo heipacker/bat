@@ -23,8 +23,8 @@ import com.dlmu.bat.common.Constants;
  */
 class NullScope extends DefaultTraceScope {
 
-    NullScope(DTraceClient dTraceClient) {
-        super(dTraceClient, null, null);
+    NullScope(BatClient batClient) {
+        super(batClient, null, null);
     }
 
     @Override
@@ -35,7 +35,7 @@ class NullScope extends DefaultTraceScope {
     @Override
     public void detach() {
         if (detached) {
-            DefaultDTraceClient.throwClientError("Can't detach this DefaultTraceScope  because " +
+            DefaultBatClient.throwClientError("Can't detach this DefaultTraceScope  because " +
                     "it is already detached.");
         }
         detached = true;
@@ -44,7 +44,7 @@ class NullScope extends DefaultTraceScope {
     @Override
     public void reattach() {
         if (!detached) {
-            DefaultDTraceClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
+            DefaultBatClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
                     "it is not detached.");
         }
         detached = false;

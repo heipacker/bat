@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 注解一个方法, 如果需要对一个方法进行包装
  * <pre>
- *       @DTrace("testTraceValue")
+ *       @BatTrace("testTraceValue")
  *       public String testMethod(@DP String name1, String name2, @DP int intValue) throws Exception {
  *           File tmpFile = new File("/home/heipacker/test.txt");
  *           if (!tmpFile.exists()) {
@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.SOURCE)
 @Inherited
 @Documented
-public @interface DTrace {
+public @interface BatTrace {
 
     /**
      * span desc
@@ -38,5 +38,5 @@ public @interface DTrace {
      *
      * @return span类型。
      */
-    String type() default "DTRACE";
+    String type() default "BATTRACE";
 }

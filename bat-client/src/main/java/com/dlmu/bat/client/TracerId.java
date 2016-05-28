@@ -30,14 +30,14 @@ import static com.dlmu.bat.common.conf.ConfigConstants.DEFAULT_TRACER_ID;
 import static com.dlmu.bat.common.conf.ConfigConstants.TRACER_ID_KEY;
 
 /**
- * <p>The HTrace dTraceClient ID.</p>
+ * <p>The HTrace batClient ID.</p>
  * <p>
- * <p>HTrace dTraceClient IDs are created from format strings.
+ * <p>HTrace batClient IDs are created from format strings.
  * Format strings contain variables which the TracerId class will
  * replace with the correct values at runtime.</p>
  * <p>
  * <ul>
- * <li>%{tname}: the dTraceClient name supplied when creating the Tracer.</li>
+ * <li>%{tname}: the batClient name supplied when creating the Tracer.</li>
  * <li>%{pname}: the process name obtained from the JVM.</li>
  * <li>%{ip}: will be replaced with an ip address.</li>
  * <li>%{pid}: the numerical process ID from the operating system.</li>

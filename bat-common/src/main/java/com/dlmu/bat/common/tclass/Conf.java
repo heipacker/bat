@@ -2,7 +2,7 @@ package com.dlmu.bat.common.tclass;
 
 import com.dlmu.bat.common.Constants;
 import com.dlmu.bat.common.tname.Utils;
-import com.dlmu.bat.common.transformer.DTraceGenerated;
+import com.dlmu.bat.common.transformer.BatTraceGenerated;
 import com.dlmu.bat.plugin.conf.Configuration;
 import com.dlmu.bat.plugin.conf.impl.AbstractConfiguration;
 import org.objectweb.asm.Type;
@@ -70,10 +70,10 @@ public class Conf {
 
     private void loadLocalConfig() {
         try {
-            Enumeration<URL> resources = Conf.class.getClassLoader().getResources(Constants.DTRACER_CONFIG_FILE);
+            Enumeration<URL> resources = Conf.class.getClassLoader().getResources(Constants.BAT_TRACER_CONFIG_FILE);
             if (resources == null) {
                 logger.warn("can not read config file by default loader");
-                resources = ClassLoader.getSystemResources(Constants.DTRACER_CONFIG_FILE);
+                resources = ClassLoader.getSystemResources(Constants.BAT_TRACER_CONFIG_FILE);
             }
             if (resources == null) {
                 logger.warn("can not read config file by system loader");
@@ -184,7 +184,7 @@ public class Conf {
         if (method.isSynthetic()) {
             return true;
         }
-        if (exist(method, DTraceGenerated.class)) {
+        if (exist(method, BatTraceGenerated.class)) {
             return true;
         }
         return false;

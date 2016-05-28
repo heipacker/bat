@@ -1,8 +1,6 @@
 package com.dlmu.test.asm;
 
 import com.dlmu.bat.agent.CosmosAgent;
-import com.dlmu.bat.client.DTraceClient;
-import com.dlmu.bat.client.DTraceClientGetter;
 import com.dlmu.bat.common.tclass.Conf;
 import com.dlmu.bat.common.transformer.TraceClassTransformer;
 import org.slf4j.Logger;

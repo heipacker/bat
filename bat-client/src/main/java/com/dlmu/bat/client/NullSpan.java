@@ -191,7 +191,7 @@ public class NullSpan extends BaseSpan implements Span {
     /**
      * Return a unique id for the process from which this Span originated.
      *
-     * @return The dTraceClient id.  Will never be null.
+     * @return The batClient id.  Will never be null.
      */
     @Override
     public String getTraceId() {
@@ -199,9 +199,9 @@ public class NullSpan extends BaseSpan implements Span {
     }
 
     /**
-     * Set the dTraceClient id of a span.
+     * Set the batClient id of a span.
      *
-     * @param traceId The dTraceClient ID to set.
+     * @param traceId The batClient ID to set.
      */
     @Override
     public void setTraceId(String traceId) {

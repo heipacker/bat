@@ -1,9 +1,9 @@
 package com.dlmu.test.asm;
 
 import com.dlmu.bat.annotation.DP;
-import com.dlmu.bat.annotation.DTrace;
-import com.dlmu.bat.client.DTraceClient;
-import com.dlmu.bat.client.DTraceClientGetter;
+import com.dlmu.bat.annotation.BatTrace;
+import com.dlmu.bat.client.BatClient;
+import com.dlmu.bat.client.BatClientGetter;
 import com.dlmu.bat.client.TraceScope;
 import com.dlmu.bat.client.TraceUtils;
 import com.dlmu.bat.common.Constants;
@@ -14,7 +14,7 @@ import com.dlmu.bat.common.Constants;
 public class AsmTestClass {
 
     public Object test() {
-        DTraceClient traceClient = DTraceClientGetter.getClient();
+        BatClient traceClient = BatClientGetter.getClient();
         TraceScope newScope = traceClient.newScope("test", TraceUtils.NEW_NO_TRACE);
         try {
             return test1();
@@ -32,7 +32,7 @@ public class AsmTestClass {
         return "";
     }
 
-    @DTrace
+    @BatTrace
     public Object testQAnnotation(@DP String str1) {
         System.out.println("test1");
         return "";

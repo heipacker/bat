@@ -27,7 +27,7 @@ import java.util.HashSet;
 /**
  * A pool of Tracer objects.
  * <p>
- * There may be more than one {@link DTraceClient} running inside a single 'process'; for example,
+ * There may be more than one {@link BatClient} running inside a single 'process'; for example,
  * unit tests may spin up a DataNode, a NameNode, and HDFS clients all running in a single JVM
  * instance, each with its own Tracer. TracerPool is where all Tracer instances register
  * on creation so Tracers can coordinate around shared resources such as {@link SpanReceiver}
@@ -37,7 +37,7 @@ public class TracerPool {
     private static final Logger logger = LoggerFactory.getLogger(TracerPool.class);
 
     /**
-     * The global pool of dTraceClient objects.
+     * The global pool of batClient objects.
      * <p>
      * This is the pool that new tracers get put into by default.
      */
@@ -81,12 +81,12 @@ public class TracerPool {
     /**
      * The current Tracers.
      */
-    private final HashSet<DTraceClient> curTracers;
+    private final HashSet<BatClient> curTracers;
 
     /**
-     * Get the global dTraceClient pool.
+     * Get the global batClient pool.
      *
-     * @return The dTraceClient pool.
+     * @return The batClient pool.
      */
     public static TracerPool getGlobalTracerPool() {
         return GLOBAL;
@@ -95,7 +95,7 @@ public class TracerPool {
     public TracerPool(String name) {
         this.name = name;
         this.shutdownHook = null;
-        this.curTracers = new HashSet<DTraceClient>();
+        this.curTracers = new HashSet<BatClient>();
         this.curReceivers = new SpanReceiver[0];
     }
 
@@ -227,16 +227,16 @@ public class TracerPool {
      *
      * @return The current array of tracers.
      */
-    public synchronized DTraceClient[] getTracers() {
-        return curTracers.toArray(new DTraceClient[curTracers.size()]);
+    public synchronized BatClient[] getTracers() {
+        return curTracers.toArray(new BatClient[curTracers.size()]);
     }
 
     /**
      * Add a new Tracer.
      */
-    synchronized void addTracer(DTraceClient dTraceClient) {
-        if (curTracers.add(dTraceClient)) {
-            logger.trace(toString() + ": adding dTraceClient " + dTraceClient.toString());
+    synchronized void addTracer(BatClient batClient) {
+        if (curTracers.add(batClient)) {
+            logger.trace(toString() + ": adding batClient " + batClient.toString());
         }
     }
 
@@ -246,9 +246,9 @@ public class TracerPool {
      * If the Tracer removed was the last one, we will close all the SpanReceiver
      * objects that we're managing.
      */
-    synchronized void removeTracer(DTraceClient dTraceClient) {
-        if (curTracers.remove(dTraceClient)) {
-            logger.trace(toString() + ": removing dTraceClient " + dTraceClient.toString());
+    synchronized void removeTracer(BatClient batClient) {
+        if (curTracers.remove(batClient)) {
+            logger.trace(toString() + ": removing batClient " + batClient.toString());
             if (curTracers.size() == 0) {
                 removeAndCloseAllSpanReceivers();
             }

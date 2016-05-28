@@ -8,14 +8,14 @@ public class Constants {
     /**
      * 存放文件的目录
      */
-    public static final String DTRACER_CONFIG_FILE = "META-INF/dtracer-annotation";
+    public static final String BAT_TRACER_CONFIG_FILE = "META-INF/bat-tracer-annotation";
 
-    public static final String SERVER_ROOT = "/dtrace/server/root";
+    public static final String SERVER_ROOT = "/battrace/server/root";
 
     //日志文件里显示的信息
-    public static final String MDC_KEY = "DTRACER";
-    public static final String TRACE_ID_IN_LOG = "DTraceId";
-    public static final String SPAN_ID_IN_LOG = "QSpanId";
+    public static final String MDC_KEY = "BATTRACER";
+    public static final String TRACE_ID_IN_LOG = "BatTraceId";
+    public static final String SPAN_ID_IN_LOG = "BatSpanId";
 
     public static final String ROOT_SPANID = "1";
 
@@ -34,9 +34,9 @@ public class Constants {
 
 
     //traceInfo
-    public static final String DTRACE_TNAME = "tname";
-    public static final String DTRACE_LOCAL_HOSTADDRESS = "T_LOCAL_HOSTADDRESS";
-    public static final String DTRACE_LOCAL_HOSTNAME = "T_LOCAL_HOSTNAME";
+    public static final String BAT_TRACE_TNAME = "tname";
+    public static final String BAT_TRACE_LOCAL_HOSTADDRESS = "T_LOCAL_HOSTADDRESS";
+    public static final String BAT_TRACE_LOCAL_HOSTNAME = "T_LOCAL_HOSTNAME";
 
 
 }

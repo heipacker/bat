@@ -16,8 +16,8 @@
  */
 package com.dlmu.bat.client.concurrent;
 
-import com.dlmu.bat.client.DTraceClient;
-import com.dlmu.bat.client.DTraceClientGetter;
+import com.dlmu.bat.client.BatClient;
+import com.dlmu.bat.client.BatClientGetter;
 import com.dlmu.bat.client.TraceScope;
 
 import java.util.Map;
@@ -59,8 +59,8 @@ public class TraceRunnable implements Runnable {
             if (description == null) {
                 description = Thread.currentThread().getName();
             }
-            DTraceClient dTraceClient = DTraceClientGetter.getClient();
-            TraceScope traceScope = dTraceClient.newScope(description, traceId, spanId, traceContext);
+            BatClient batClient = BatClientGetter.getClient();
+            TraceScope traceScope = batClient.newScope(description, traceId, spanId, traceContext);
             try {
                 runnable.run();
             } finally {

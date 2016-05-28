@@ -13,7 +13,7 @@ import java.util.Map;
 
 class TraceMethodVisitor extends MethodVisitor implements Opcodes {
 
-    private static final String TRACE_GENERATED_DESC = Type.getDescriptor(DTraceGenerated.class);
+    private static final String TRACE_GENERATED_DESC = Type.getDescriptor(BatTraceGenerated.class);
 
     private static final String TRACEUTILS_INTERNALNAME = "com/dlmu/bat/client/TraceUtils";
 
@@ -250,12 +250,12 @@ class TraceMethodVisitor extends MethodVisitor implements Opcodes {
     }
 
     private void startTrace(int scopeVarIndex) {
-        //DTraceClient client = DTraceClientGetter.getClient();
-        traceMethod.visitMethodInsn(INVOKESTATIC, "com/dlmu/bat/client/DTraceClientGetter", "getClient", "()Lcom/dlmu/bat/client/DTraceClient;", false);
+        //BatClient client = BatClientGetter.getClient();
+        traceMethod.visitMethodInsn(INVOKESTATIC, "com/dlmu/bat/client/BatClientGetter", "getClient", "()Lcom/dlmu/bat/client/BatClient;", false);
         // TraceScope scope = client.newScope(method.getSignature(), traceInfo);
         traceMethod.visitLdcInsn(method.getDescription());
         traceMethod.visitFieldInsn(GETSTATIC, "com/dlmu/bat/client/TraceUtils", "NEW_NO_TRACE", "Lcom/dlmu/bat/client/TraceInfo;");
-        traceMethod.visitMethodInsn(INVOKEINTERFACE, "com/dlmu/bat/client/DTraceClient", "newScope", "(Ljava/lang/String;Lcom/dlmu/bat/client/TraceInfo;)Lcom/dlmu/bat/client/TraceScope;", true);
+        traceMethod.visitMethodInsn(INVOKEINTERFACE, "com/dlmu/bat/client/BatClient", "newScope", "(Ljava/lang/String;Lcom/dlmu/bat/client/TraceInfo;)Lcom/dlmu/bat/client/TraceScope;", true);
         //store scope to local variable
         traceMethod.visitVarInsn(ASTORE, scopeVarIndex);
 

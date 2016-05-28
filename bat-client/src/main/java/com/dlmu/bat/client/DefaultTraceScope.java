@@ -25,9 +25,9 @@ import java.io.Closeable;
  */
 public class DefaultTraceScope implements TraceScope, Closeable {
     /**
-     * The dTraceClient to use for this scope.
+     * The batClient to use for this scope.
      */
-    final DTraceClient dTraceClient;
+    final BatClient batClient;
 
     /**
      * The trace span for this scope, or null if the scope is closed.
@@ -46,8 +46,8 @@ public class DefaultTraceScope implements TraceScope, Closeable {
      */
     boolean detached;
 
-    public DefaultTraceScope(DTraceClient dTraceClient, Span span, Span parentSpan) {
-        this.dTraceClient = dTraceClient;
+    public DefaultTraceScope(BatClient batClient, Span span, Span parentSpan) {
+        this.batClient = batClient;
         this.span = span;
         this.parentSpan = parentSpan;
         this.detached = false;
@@ -89,10 +89,10 @@ public class DefaultTraceScope implements TraceScope, Closeable {
      */
     public void detach() {
         if (detached) {
-            DefaultDTraceClient.throwClientError("Can't detach this DefaultTraceScope  because " +
+            DefaultBatClient.throwClientError("Can't detach this DefaultTraceScope  because " +
                     "it is already detached.");
         }
-        DefaultDTraceClient.detachScope(this);
+        DefaultBatClient.detachScope(this);
         detached = true;
         parentSpan = null;
     }
@@ -102,10 +102,10 @@ public class DefaultTraceScope implements TraceScope, Closeable {
      */
     public void reattach() {
         if (!detached) {
-            DefaultDTraceClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
+            DefaultBatClient.throwClientError("Can't reattach this DefaultTraceScope  because " +
                     "it is not detached.");
         }
-        DefaultDTraceClient.reattachScope(this);
+        DefaultBatClient.reattachScope(this);
         detached = false;
     }
 
@@ -114,7 +114,7 @@ public class DefaultTraceScope implements TraceScope, Closeable {
      */
     @Override
     public void close() {
-        dTraceClient.closeScope(this);
+        batClient.closeScope(this);
     }
 
     /**

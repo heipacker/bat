@@ -1,7 +1,7 @@
 package com.dlmu.bat.client.proxy;
 
-import com.dlmu.bat.client.DTraceClient;
-import com.dlmu.bat.client.DTraceClientGetter;
+import com.dlmu.bat.client.BatClient;
+import com.dlmu.bat.client.BatClientGetter;
 import com.dlmu.bat.client.TraceScope;
 import com.dlmu.bat.common.Constants;
 
@@ -24,8 +24,8 @@ public class ProxyUtils {
             @Override
             public Object invoke(Object obj, Method method, Object[] args)
                     throws Throwable {
-                DTraceClient dTraceClient = DTraceClientGetter.getClient();
-                TraceScope traceScope = dTraceClient.newScope(method.getName());
+                BatClient batClient = BatClientGetter.getClient();
+                TraceScope traceScope = batClient.newScope(method.getName());
                 try {
                     return method.invoke(instance, args);
                 } catch (Throwable e) {
