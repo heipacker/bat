@@ -16,15 +16,14 @@
  */
 package com.dlmu.bat.client.sampler;
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
 
 /**
  * A Sampler that never returns true.
  */
 public final class NeverSampler extends Sampler {
-    public static final NeverSampler INSTANCE = new NeverSampler(null);
 
-    public NeverSampler(DTraceConfiguration conf) {
+    public NeverSampler(Configuration conf) {
     }
 
     @Override

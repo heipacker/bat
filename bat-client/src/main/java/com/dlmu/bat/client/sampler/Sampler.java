@@ -16,12 +16,6 @@
  */
 package com.dlmu.bat.client.sampler;
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
-
 /**
  * Extremely simple callback to determine the frequency that an action should
  * be performed.
@@ -38,95 +32,5 @@ import java.lang.reflect.Constructor;
  * other requests.</p>
  */
 public abstract class Sampler {
-    /**
-     * A {@link Sampler} builder. It takes a {@link Sampler} class name and
-     * constructs an instance of that class, with the provided configuration.
-     */
-    public static class Builder {
-        private static final Logger LOG = LoggerFactory.getLogger(Builder.class);
-
-        private final static String DEFAULT_PACKAGE = Sampler.class.getPackage().getName();
-        private final DTraceConfiguration conf;
-        private String className;
-        private ClassLoader classLoader = Builder.class.getClassLoader();
-
-        public Builder(DTraceConfiguration conf) {
-            this.conf = conf;
-            reset();
-        }
-
-        public Builder reset() {
-            this.className = null;
-            return this;
-        }
-
-        public Builder className(String className) {
-            this.className = className;
-            return this;
-        }
-
-        public Builder classLoader(ClassLoader classLoader) {
-            this.classLoader = classLoader;
-            return this;
-        }
-
-        private void throwError(String errorStr) {
-            LOG.error(errorStr);
-            throw new RuntimeException(errorStr);
-        }
-
-        private void throwError(String errorStr, Throwable e) {
-            LOG.error(errorStr, e);
-            throw new RuntimeException(errorStr, e);
-        }
-
-        public Sampler build() {
-            Sampler sampler = newSampler();
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Created new sampler of type " +
-                        sampler.getClass().getName(), new Exception());
-            }
-            return sampler;
-        }
-
-        private Sampler newSampler() {
-            if (className == null || className.isEmpty()) {
-                throwError("No sampler class specified.");
-            }
-            String str = className;
-            if (!str.contains(".")) {
-                str = DEFAULT_PACKAGE + "." + str;
-            }
-            Class cls = null;
-            try {
-                cls = classLoader.loadClass(str);
-            } catch (ClassNotFoundException e) {
-                throwError("Cannot find Sampler class " + str);
-            }
-            Constructor<Sampler> ctor = null;
-            try {
-                ctor = cls.getConstructor(DTraceConfiguration.class);
-            } catch (NoSuchMethodException e) {
-                throwError("Cannot find a constructor for class " +
-                        str + " which takes an HTraceConfiguration.");
-            }
-            Sampler sampler = null;
-            try {
-                LOG.debug("Creating new instance of " + str + "...");
-                sampler = ctor.newInstance(conf);
-            } catch (ReflectiveOperationException e) {
-                throwError("Reflection error when constructing " +
-                        str + ".", e);
-            } catch (Throwable t) {
-                throwError("NewInstance error when constructing " +
-                        str + ".", t);
-            }
-            return sampler;
-        }
-    }
-
-    public static final Sampler ALWAYS = AlwaysSampler.INSTANCE;
-    public static final Sampler NEVER = NeverSampler.INSTANCE;
-
     public abstract boolean next();
 }

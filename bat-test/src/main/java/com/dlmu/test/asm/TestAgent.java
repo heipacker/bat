@@ -1,7 +1,9 @@
 package com.dlmu.test.asm;
 
 import com.dlmu.bat.agent.CosmosAgent;
-import com.dlmu.bat.common.tclass.Configuration;
+import com.dlmu.bat.client.DTraceClient;
+import com.dlmu.bat.client.DTraceClientGetter;
+import com.dlmu.bat.common.tclass.Conf;
 import com.dlmu.bat.common.transformer.TraceClassTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import java.lang.instrument.Instrumentation;
 public class TestAgent {
 
     private static final Logger logger = LoggerFactory.getLogger(TestAgent.class);
+
     /**
      * 第一个种， 程序启动是attach
      * VM options: -javaagent:/home/fupan/IdeaProjects/bat/bat-agent/target/bat-agent-1.0-SNAPSHOT.jar
@@ -28,12 +31,13 @@ public class TestAgent {
 
         System.out.println("run test agent");
         Instrumentation instrumentation = CosmosAgent.getInstrumentation();
-        Configuration configuration = new Configuration();
+        Conf configuration = new Conf();
         if (!configuration.isInstrument()) {
             logger.warn("未开启instrument");
             return;
         }
         instrumentation.addTransformer(new TraceClassTransformer(configuration));
         new TestService().sayHello();
+        DTraceClientGetter.getClient().close();
     }
 }

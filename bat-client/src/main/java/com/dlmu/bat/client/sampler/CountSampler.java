@@ -16,7 +16,7 @@
  */
 package com.dlmu.bat.client.sampler;
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,12 +25,13 @@ import java.util.concurrent.ThreadLocalRandom;
  * {@code long} value for {@link #SAMPLER_FREQUENCY_CONF_KEY}.
  */
 public class CountSampler extends Sampler {
+
     public final static String SAMPLER_FREQUENCY_CONF_KEY = "sampler.frequency";
 
     final long frequency;
     long count = ThreadLocalRandom.current().nextLong();
 
-    public CountSampler(DTraceConfiguration conf) {
+    public CountSampler(Configuration conf) {
         this.frequency = Long.parseLong(conf.get(SAMPLER_FREQUENCY_CONF_KEY), 10);
     }
 

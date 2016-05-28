@@ -1,12 +1,17 @@
 package com.dlmu.bat.common.transformer;
 
-import com.dlmu.bat.common.tclass.Configuration;
+import com.dlmu.bat.common.tclass.Conf;
 import com.dlmu.bat.common.tclass.TraceClass;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -19,9 +24,9 @@ public class TraceClassTransformer implements ClassFileTransformer {
 
     private static final Logger logger = LoggerFactory.getLogger(TraceClassTransformer.class);
 
-    private final Configuration configuration;
+    private final Conf configuration;
 
-    public TraceClassTransformer(Configuration configuration) {
+    public TraceClassTransformer(Conf configuration) {
         this.configuration = configuration;
     }
 

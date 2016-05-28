@@ -16,8 +16,8 @@
  */
 package com.dlmu.bat.client;
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
 import com.dlmu.bat.common.tname.Utils;
+import com.dlmu.bat.plugin.conf.Configuration;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public final class TracerId {
      * @param sample
      * @return
      */
-    public static String next(DTraceConfiguration conf, Sample sample) {
+    public static String next(Configuration conf, Sample sample) {
         if (conf != null) {
             String fmt = conf.get(TRACER_ID_KEY);
             if (!Strings.isNullOrEmpty(fmt)) {
@@ -97,7 +97,7 @@ public final class TracerId {
      * @param conf
      * @return
      */
-    public static String next(DTraceConfiguration conf) {
+    public static String next(Configuration conf) {
         String fmt = conf.get(TRACER_ID_KEY, DEFAULT_TRACER_ID);
         StringBuilder bld = new StringBuilder();
         StringBuilder varBld = null;

@@ -2,7 +2,10 @@ package com.dlmu.test.asm;
 
 import com.dlmu.bat.annotation.DP;
 import com.dlmu.bat.annotation.DTrace;
-import com.dlmu.bat.client.*;
+import com.dlmu.bat.client.DTraceClient;
+import com.dlmu.bat.client.DTraceClientGetter;
+import com.dlmu.bat.client.TraceScope;
+import com.dlmu.bat.client.TraceUtils;
 import com.dlmu.bat.common.Constants;
 
 /**

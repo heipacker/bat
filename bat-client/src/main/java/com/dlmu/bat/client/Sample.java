@@ -1,5 +1,7 @@
 package com.dlmu.bat.client;
 
+import com.google.common.base.Optional;
+
 /**
  * @author heipacker
  * @date 16-5-23.
@@ -30,4 +32,12 @@ public enum Sample {
         return suffix;
     }
 
+    public static Optional<Sample> getSample(char suffix) {
+        for (Sample sample : Sample.values()) {
+            if (sample.getSuffix() == suffix) {
+                return Optional.of(sample);
+            }
+        }
+        return Optional.absent();
+    }
 }

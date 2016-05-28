@@ -16,9 +16,8 @@
  */
 package com.dlmu.bat.client.receiver;
 
-import com.dlmu.bat.client.Span;
 import com.dlmu.bat.common.BaseSpan;
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +43,12 @@ public abstract class SpanReceiver implements Closeable {
         private static final Logger logger = LoggerFactory.getLogger(Builder.class);
 
         public static String DEFAULT_PACKAGE = SpanReceiver.class.getPackage().getName();
-        private final DTraceConfiguration conf;
+        private final Configuration conf;
         private boolean logErrors;
         private String className;
         private ClassLoader classLoader = Builder.class.getClassLoader();
 
-        public Builder(DTraceConfiguration conf) {
+        public Builder(Configuration conf) {
             this.conf = conf;
             reset();
         }
@@ -125,7 +124,7 @@ public abstract class SpanReceiver implements Closeable {
             }
             Constructor<SpanReceiver> ctor = null;
             try {
-                ctor = cls.getConstructor(DTraceConfiguration.class);
+                ctor = cls.getConstructor(Configuration.class);
             } catch (NoSuchMethodException e) {
                 throwError("Cannot find a constructor for class " +
                         str + "which takes an HTraceConfiguration.");

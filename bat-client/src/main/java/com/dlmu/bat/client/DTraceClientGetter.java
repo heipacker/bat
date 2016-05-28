@@ -1,6 +1,6 @@
 package com.dlmu.bat.client;
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.impl.AbstractConfiguration;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -13,7 +13,7 @@ public class DTraceClientGetter {
     private static final Supplier<DTraceClient> instance = Suppliers.memoize(new Supplier<DTraceClient>() {
         @Override
         public DTraceClient get() {
-            return new DefaultDTraceClient(DTraceConfiguration.fromMap(System.getenv()));
+            return new DefaultDTraceClient(AbstractConfiguration.getConfiguration());
         }
     });
 

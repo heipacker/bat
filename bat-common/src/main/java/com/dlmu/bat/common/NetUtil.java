@@ -81,12 +81,12 @@ public class NetUtil {
     public static final String LOCALHOST = "127.0.0.1";
 
     public static final String ANYHOST = "0.0.0.0";
-    
+
     public static InetSocketAddress createSocketAddress(String server) {
-    	String[] serverSplit = server.split(":");
-    	String hostname = serverSplit[0];
-    	int port = Integer.parseInt(serverSplit[1]);
-    	return new InetSocketAddress(hostname, port);
+        String[] serverSplit = server.split(":");
+        String hostname = serverSplit[0];
+        int port = Integer.parseInt(serverSplit[1]);
+        return new InetSocketAddress(hostname, port);
     }
 
     public static List<InetSocketAddress> resolveSocketAddresses(String addresses) {

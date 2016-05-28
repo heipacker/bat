@@ -7,7 +7,6 @@ import com.dlmu.bat.common.loadbalance.LoadBalance;
 import java.util.List;
 
 /**
- *
  * @author heipacker
  */
 public abstract class ComposeLoadBalance<T> extends AbstractLoadBalance<T> {

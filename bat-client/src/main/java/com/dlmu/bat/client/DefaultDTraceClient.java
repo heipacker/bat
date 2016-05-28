@@ -1,45 +1,35 @@
 package com.dlmu.bat.client;
 
+import com.dlmu.bat.client.receiver.LocalFileSpanReceiver;
 import com.dlmu.bat.client.receiver.SpanReceiver;
+import com.dlmu.bat.client.sampler.NeverSampler;
 import com.dlmu.bat.client.sampler.Sampler;
 import com.dlmu.bat.common.BaseSpan;
+import com.dlmu.bat.common.ClassUtils;
 import com.dlmu.bat.common.Constants;
-import com.dlmu.bat.common.conf.DTraceConfiguration;
-import com.google.common.base.Objects;
+import com.dlmu.bat.common.conf.ConfigConstants;
+import com.dlmu.bat.plugin.conf.Configuration;
+import com.google.common.base.*;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Map;
 
 /**
  * @author heipacker on 16-5-18.
  */
-public class DefaultDTraceClient implements DTraceClient {
+class DefaultDTraceClient implements DTraceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultDTraceClient.class);
 
     private static final TraceStatus traceStatus = DefaultTraceStatus.getInstance();
 
-    private DTraceConfiguration configuration;
-    /**
-     * The TracerPool which this Tracer belongs to.
-     * <p>
-     * This gets set to null after the Tracer is closed in order to catch some
-     * use-after-close errors.  Note that we do not synchronize access on this
-     * field, since it only changes when the Tracer is closed, and the Tracer
-     * should not be used after that.
-     */
-    private TracerPool tracerPool = TracerPool.getGlobalTracerPool();
+    private Configuration configuration;
 
-    /**
-     * The NullScope instance for this Tracer.
-     */
-    private final NullScope nullScope;
+    private SpanReceiver spanReceiver;
 
     /**
      * The currently active Samplers.
@@ -47,11 +37,49 @@ public class DefaultDTraceClient implements DTraceClient {
      * Arrays are immutable once set.  You must take the Tracer lock in order to
      * set this to a new array.  If this is null, the Tracer is closed.
      */
-    private volatile Sampler[] curSamplers;
+    private volatile Sampler curSampler;
 
-    public DefaultDTraceClient(DTraceConfiguration configuration) {
+    DefaultDTraceClient(Configuration configuration) {
         this.configuration = configuration;
-        this.nullScope = new NullScope(this);
+        this.spanReceiver = loadReceiverType(this.configuration, null);
+        this.configuration.addListener(new Configuration.ConfigurationListener() {
+            @Override
+            public void call(Configuration configuration) {
+                String configSampler = configuration.get(ConfigConstants.SAMPLER_CLASS_KEY, NeverSampler.class.getName());
+                if (curSampler != null && Objects.equal(configSampler, curSampler.getClass().getName())) {
+                    return;
+                }
+                Class<?> configSamplerClass = ClassUtils.forName(configSampler);
+                Preconditions.checkNotNull(configSamplerClass);
+                try {
+                    Constructor<?> configSamplerClassConstructor = configSamplerClass.getConstructor(Configuration.class);
+                    curSampler = (Sampler) configSamplerClassConstructor.newInstance(DefaultDTraceClient.this.configuration);
+                } catch (Exception e) {
+                    logger.error("get constructor error", e);
+                    throw Throwables.propagate(e);
+                }
+            }
+        }, true);
+    }
+
+    /**
+     * Given a SpanReceiver class name, return the existing instance of that span
+     * receiver, if possible; otherwise, invoke the callable to create a new
+     * instance.
+     *
+     * @param conf        The HTrace configuration.
+     * @param classLoader The class loader to use.
+     * @return The SpanReceiver.
+     */
+    private SpanReceiver loadReceiverType(Configuration conf, ClassLoader classLoader) {
+        String className = conf.get(ConfigConstants.RECEIVER_TYPE_KEY, LocalFileSpanReceiver.class.getName());
+        logger.trace(toString() + ": creating a new SpanReceiver of type " +
+                className);
+        SpanReceiver receiver = new SpanReceiver.Builder(conf).
+                className(className).
+                classLoader(classLoader == null ? SpanReceiver.Builder.class.getClassLoader() : classLoader).
+                build();
+        return receiver;
     }
 
     /**
@@ -76,26 +104,65 @@ public class DefaultDTraceClient implements DTraceClient {
     public TraceScope newScope(String description, TraceInfo traceInfo) {
         if (traceInfo == null || Objects.equal(traceInfo.traceId, Constants.NO_NEW_TRACEID)) {//root
             Span parent = traceStatus.getCurrentSpan();
-            if (parent != null) {
+            if (parent != null) {//存在parent 说明不是root
                 String traceId = parent.getTraceId();
                 String spanId = parent.getSpanId();
-                ImmutableMap<String, String> traceContext = parent.getTraceContext();
-                return newScope(description, new TraceInfo(traceId, spanId, traceContext));
+                return newDefaultScope(description, traceId, spanId, parent.getTraceContext());
+            } else {//root
+                return newRootScope(description);
             }
-            Sample sample = getSample(description, null);
-            String traceId = TracerId.next(configuration, sample);
-            MilliSpan span = new MilliSpan(description, traceId, Constants.ROOT_SPANID);
-            traceStatus.setCurrentSpan(span);
-            return new DefaultTraceScope(this, span, null);
         }
-        MilliSpan parent = new MilliSpan(description, traceInfo.traceId, traceInfo.spanId);
+        if (Strings.isNullOrEmpty(traceInfo.traceId)) {
+            return newRootScope(description);
+        }
+        return newDefaultScope(description, traceInfo.traceId, traceInfo.spanId, traceInfo.traceContext);
+    }
+
+    private TraceScope newDefaultScope(String description, String traceId, String spanId, Map<String, String> traceContext) {
+        Span parent;
+        if (getSample(traceId) == Sample.NO) {
+            parent = new NullSpan(description, traceId, spanId);
+        } else {
+            parent = new MilliSpan(description, traceId, spanId, traceContext);
+        }
         Span childSpan = parent.child(description);
         traceStatus.setCurrentSpan(childSpan);
         return new DefaultTraceScope(this, childSpan, parent);
     }
 
-    private Sample getSample(String description, String traceId) {
-        return Sample.MUST;
+    private TraceScope newRootScope(String description) {
+        Sample sample = getSample(null);
+        String traceId = TracerId.next(configuration, sample);
+        MilliSpan span = new MilliSpan(description, traceId, Constants.ROOT_SPANID);
+        traceStatus.setCurrentSpan(span);
+        return new DefaultTraceScope(this, span, null);
+    }
+
+    /**
+     * 如果是空或者是NO_NEW_TRACEID则根据curSampler来判断是否需要采样
+     * 如果traceId非空, 则通过traceId判断是否采样, 如果采样则也采样
+     *
+     * @param traceId
+     * @return
+     */
+    private Sample getSample(String traceId) {
+        if (Strings.isNullOrEmpty(traceId) || Objects.equal(Constants.NO_NEW_TRACEID, traceId)) {
+            return curSampler.next() ? Sample.SHOULD : Sample.NO;
+        }
+        //override 当前应用能够覆盖traceId的采样
+        if (configuration.getBoolean(ConfigConstants.OVERRIDE_SAMPLE_ENABLED_KEY, ConfigConstants.DEFAULT_OVERRIDE_SAMPLE_ENABLED)) {
+            return curSampler.next() ? Sample.SHOULD : Sample.NO;
+        }
+        int lastIndexOf = traceId.lastIndexOf("_");
+        if (lastIndexOf < 0) {
+            return Sample.NO;
+        }
+        char suffix = traceId.charAt(lastIndexOf + 1);
+        Optional<Sample> sampleOptional = Sample.getSample(suffix);
+        if (sampleOptional.isPresent()) {
+            return sampleOptional.get();
+        }
+        return Sample.NO;
     }
 
     /**
@@ -130,93 +197,7 @@ public class DefaultDTraceClient implements DTraceClient {
      * @return The null trace scope.
      */
     public TraceScope newNullScope() {
-        return nullScope;
-    }
-
-
-    public TracerPool getTracerPool() {
-        if (tracerPool == null) {
-            throwClientError(toString() + " is closed.");
-        }
-        return tracerPool;
-    }
-
-    /**
-     * Return true if we should create a new top-level span.
-     * <p>
-     * We will create the span if any configured sampler returns true.
-     */
-    private boolean sample() {
-        Sampler[] samplers = curSamplers;
-        for (Sampler sampler : samplers) {
-            if (sampler.next()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns an array of all the current Samplers.
-     * <p>
-     * Note that if the current Samplers change, those changes will not be
-     * reflected in this array.  In other words, this array may be stale.
-     *
-     * @return The current samplers.
-     */
-    public Sampler[] getSamplers() {
-        return curSamplers;
-    }
-
-    /**
-     * Add a new Sampler.
-     *
-     * @param sampler The new sampler to add.
-     *                You cannot add a particular Sampler object more
-     *                than once.  You may add multiple Sampler objects
-     *                of the same type, although this is not recommended.
-     * @return True if the sampler was added; false if it already had
-     * been added earlier.
-     */
-    public synchronized boolean addSampler(Sampler sampler) {
-        if (tracerPool == null) {
-            throwClientError(toString() + " is closed.");
-        }
-        Sampler[] samplers = curSamplers;
-        for (int i = 0; i < samplers.length; i++) {
-            if (samplers[i] == sampler) {
-                return false;
-            }
-        }
-        Sampler[] newSamplers =
-                Arrays.copyOf(samplers, samplers.length + 1);
-        newSamplers[samplers.length] = sampler;
-        curSamplers = newSamplers;
-        return true;
-    }
-
-    /**
-     * Remove a Sampler.
-     *
-     * @param sampler The sampler to remove.
-     * @return True only if the sampler was removed.
-     */
-    public synchronized boolean removeSampler(Sampler sampler) {
-        if (tracerPool == null) {
-            throwClientError(toString() + " is closed.");
-        }
-        Sampler[] samplers = curSamplers;
-        for (int i = 0; i < samplers.length; i++) {
-            if (samplers[i] == sampler) {
-                Sampler[] newSamplers = new Sampler[samplers.length - 1];
-                System.arraycopy(samplers, 0, newSamplers, 0, i);
-                System.arraycopy(samplers, i + 1, newSamplers, i,
-                        samplers.length - i - 1);
-                curSamplers = newSamplers;
-                return true;
-            }
-        }
-        return false;
+        return new NullScope(this);
     }
 
     static void detachScope(TraceScope scope) {
@@ -243,20 +224,14 @@ public class DefaultDTraceClient implements DTraceClient {
                     scope.getSpan() + " because it is not the current " +
                     "TraceScope in thread " + Thread.currentThread().getName());
         }
-        if (tracerPool == null) {
-            throwClientError(toString() + " is closed.");
-        }
-        SpanReceiver[] receivers = tracerPool.getReceivers();
-        if (receivers == null) {
+        if (spanReceiver == null) {
             throwClientError(toString() + " is closed.");
         }
         traceStatus.setCurrentSpan(scope.getParentSpan());
         scope.setParentSpan(null);
         Span span = scope.getSpan();
         span.stop();
-        for (SpanReceiver receiver : receivers) {
-            receiver.receiveSpan((BaseSpan) span);
-        }
+        spanReceiver.receiveSpan((BaseSpan) span);
     }
 
     public Span getCurrentSpan() {
@@ -274,11 +249,14 @@ public class DefaultDTraceClient implements DTraceClient {
 
     @Override
     public synchronized void close() {
-        if (tracerPool == null) {
+        if (spanReceiver == null) {
             return;
         }
-        curSamplers = new Sampler[0];
-        tracerPool.removeTracer(this);
+        try {
+            spanReceiver.close();
+        } catch (IOException e) {
+            logger.error("close spanReceiver error", e);
+        }
     }
 
     /**

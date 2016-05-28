@@ -38,7 +38,6 @@ import java.security.ProtectionDomain;
  *     7.interface、abstract方法、navicat方法忽略替换。
  *     8.同级方法替换可以支持private方法、final方法、this调用等cglib无法支持的场景。
  * </pre>
- *
  */
 final class TraceClassVisitor extends ClassVisitor implements Opcodes {
     private static final Logger logger = LoggerFactory.getLogger(TraceClassVisitor.class);

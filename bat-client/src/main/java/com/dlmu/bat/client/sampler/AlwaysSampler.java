@@ -16,7 +16,7 @@
  */
 package com.dlmu.bat.client.sampler;
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
 
 /**
  * A Sampler that always returns true.
@@ -24,7 +24,7 @@ import com.dlmu.bat.common.conf.DTraceConfiguration;
 public final class AlwaysSampler extends Sampler {
     public static final AlwaysSampler INSTANCE = new AlwaysSampler(null);
 
-    public AlwaysSampler(DTraceConfiguration conf) {
+    public AlwaysSampler(Configuration conf) {
     }
 
     @Override

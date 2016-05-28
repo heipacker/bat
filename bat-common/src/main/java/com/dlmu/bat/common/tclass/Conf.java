@@ -1,9 +1,10 @@
 package com.dlmu.bat.common.tclass;
 
+import com.dlmu.bat.common.Constants;
 import com.dlmu.bat.common.tname.Utils;
 import com.dlmu.bat.common.transformer.DTraceGenerated;
-import com.dlmu.bat.common.Constants;
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
+import com.dlmu.bat.plugin.conf.impl.AbstractConfiguration;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Configuration {
-    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+public class Conf {
+    private static final Logger logger = LoggerFactory.getLogger(Conf.class);
 
     private volatile Map<String, TraceClass> config;
 
-    private DTraceConfiguration conf;
+    private Configuration configuration;
 
     private TraceConfigParser parser;
 
@@ -35,14 +36,15 @@ public class Configuration {
     private static final Object HOLDER = new Object();
     private final ConcurrentMap<String, Object> watches;
 
-    public Configuration() {
+    public Conf() {
         this.config = new HashMap<String, TraceClass>();
         this.parser = new TraceConfigParser();
         this.watches = new ConcurrentHashMap<String, Object>();
 
         loadLocalConfig();
         Map<String, String> globalConfig = loadGlobalConfig("instrument.properties");
-        conf = DTraceConfiguration.fromMap(globalConfig);
+        configuration = AbstractConfiguration.getConfiguration();
+        configuration.putAll(globalConfig);
 
         String instrumentMethodContent = loadCommonInstrumentMethod("instrument-method");
         if (loaded.compareAndSet(false, true)) {
@@ -68,7 +70,7 @@ public class Configuration {
 
     private void loadLocalConfig() {
         try {
-            Enumeration<URL> resources = Configuration.class.getClassLoader().getResources(Constants.DTRACER_CONFIG_FILE);
+            Enumeration<URL> resources = Conf.class.getClassLoader().getResources(Constants.DTRACER_CONFIG_FILE);
             if (resources == null) {
                 logger.warn("can not read config file by default loader");
                 resources = ClassLoader.getSystemResources(Constants.DTRACER_CONFIG_FILE);
@@ -108,12 +110,12 @@ public class Configuration {
     }
 
     public boolean isInstrument() {
-        boolean defaultSwitch = conf.getBoolean("default", false);
+        boolean defaultSwitch = configuration.getBoolean("default", false);
         return getBoolean(Utils.getTName(), defaultSwitch);
     }
 
     private boolean getBoolean(String name, boolean def) {
-        String value = conf.get(name);
+        String value = configuration.get(name);
         if (value == null || value.length() == 0) {
             return def;
         }

@@ -17,7 +17,7 @@
 package com.dlmu.bat.client.sampler;
 
 
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +28,14 @@ import java.util.concurrent.ThreadLocalRandom;
  * configuring a {@code double} value for {@link #SAMPLER_FRACTION_CONF_KEY}.
  */
 public class ProbabilitySampler extends Sampler {
+
     private static final Logger logger = LoggerFactory.getLogger(ProbabilitySampler.class);
+
     public final double threshold;
+
     public final static String SAMPLER_FRACTION_CONF_KEY = "sampler.fraction";
 
-    public ProbabilitySampler(DTraceConfiguration conf) {
+    public ProbabilitySampler(Configuration conf) {
         this.threshold = Double.parseDouble(conf.get(SAMPLER_FRACTION_CONF_KEY));
         if (logger.isTraceEnabled()) {
             logger.trace("Created new ProbabilitySampler with threshold = " +

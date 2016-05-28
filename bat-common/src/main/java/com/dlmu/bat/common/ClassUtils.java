@@ -26,12 +26,12 @@ import java.util.Map;
 
 /**
  * ClassUtils. (Tool, Static, ThreadSafe)
- * 
+ *
  * @author heipacker
  * @date 16.05.27
  */
 public class ClassUtils {
-    
+
     public static final String CLASS_EXTENSION = ".class";
 
     public static final String JAVA_EXTENSION = ".java";
@@ -45,8 +45,8 @@ public class ClassUtils {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
-    
-    public static Class<?> forName(String[] packages, String className)  {
+
+    public static Class<?> forName(String[] packages, String className) {
         try {
             return _forName(className);
         } catch (ClassNotFoundException e) {
@@ -61,7 +61,7 @@ public class ClassUtils {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
-    
+
     public static Class<?> forName(String className) {
         try {
             return _forName(className);
@@ -69,7 +69,7 @@ public class ClassUtils {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
-    
+
     public static Class<?> _forName(String className) throws ClassNotFoundException {
         if ("boolean".equals(className))
             return boolean.class;
@@ -116,25 +116,26 @@ public class ClassUtils {
             throw e;
         }
     }
-    
+
     private static Class<?> arrayForName(String className) throws ClassNotFoundException {
         return Class.forName(className.endsWith("[]")
                 ? "[L" + className.substring(0, className.length() - 2) + ";"
-                        : className, true, Thread.currentThread().getContextClassLoader());
+                : className, true, Thread.currentThread().getContextClassLoader());
     }
 
-    
+
     public static boolean isNotEmpty(Object object) {
         return getSize(object) > 0;
     }
-    
+
     public static int getSize(Object object) {
         if (object == null) {
             return 0;
-        } if (object instanceof Collection<?>) {
-            return ((Collection<?>)object).size();
+        }
+        if (object instanceof Collection<?>) {
+            return ((Collection<?>) object).size();
         } else if (object instanceof Map<?, ?>) {
-            return ((Map<?, ?>)object).size();
+            return ((Map<?, ?>) object).size();
         } else if (object.getClass().isArray()) {
             return Array.getLength(object);
         } else {
@@ -149,7 +150,7 @@ public class ClassUtils {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static Class<?> getGenericClass(Class<?> cls) {
         return getGenericClass(cls, 0);
     }
@@ -173,17 +174,17 @@ public class ClassUtils {
             throw new IllegalArgumentException(cls.getName() + " generic type undefined!");
         }
     }
-    
+
     public static boolean isBeforeJava5(String javaVersion) {
-        return (javaVersion == null || javaVersion.length() == 0 || "1.0".equals(javaVersion) 
-                || "1.1".equals(javaVersion) || "1.2".equals(javaVersion) 
+        return (javaVersion == null || javaVersion.length() == 0 || "1.0".equals(javaVersion)
+                || "1.1".equals(javaVersion) || "1.2".equals(javaVersion)
                 || "1.3".equals(javaVersion) || "1.4".equals(javaVersion));
     }
-    
+
     public static boolean isBeforeJava6(String javaVersion) {
         return isBeforeJava5(javaVersion) || "1.5".equals(javaVersion);
     }
-    
+
     public static String toString(Throwable e) {
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
@@ -201,13 +202,13 @@ public class ClassUtils {
     }
 
     private static final int JIT_LIMIT = 5 * 1024;
-    
+
     public static void checkBytecode(String name, byte[] bytecode) {
         if (bytecode.length > JIT_LIMIT) {
             System.err.println("The template bytecode too long, may be affect the JIT compiler. template class: " + name);
         }
     }
-    
+
     public static String getSizeMethod(Class<?> cls) {
         try {
             return cls.getMethod("size", new Class<?>[0]).getName() + "()";
@@ -227,12 +228,12 @@ public class ClassUtils {
             }
         }
     }
-    
+
     public static String getMethodName(Method method, Class<?>[] parameterClasses, String rightCode) {
         if (method.getParameterTypes().length > parameterClasses.length) {
             Class<?>[] types = method.getParameterTypes();
             StringBuilder buf = new StringBuilder(rightCode);
-            for (int i = parameterClasses.length; i < types.length; i ++) {
+            for (int i = parameterClasses.length; i < types.length; i++) {
                 if (buf.length() > 0) {
                     buf.append(",");
                 }
@@ -257,7 +258,7 @@ public class ClassUtils {
         }
         return method.getName() + "(" + rightCode + ")";
     }
-    
+
     public static Method searchMethod(Class<?> currentClass, String name, Class<?>[] parameterTypes) throws NoSuchMethodException {
         if (currentClass == null) {
             throw new NoSuchMethodException("class == null");
@@ -272,13 +273,13 @@ public class ClassUtils {
                     if (parameterTypes.length > 0) {
                         Class<?>[] types = method.getParameterTypes();
                         boolean match = true;
-                        for (int i = 0; i < parameterTypes.length; i ++) {
-                            if (! types[i].isAssignableFrom(parameterTypes[i])) {
+                        for (int i = 0; i < parameterTypes.length; i++) {
+                            if (!types[i].isAssignableFrom(parameterTypes[i])) {
                                 match = false;
                                 break;
                             }
                         }
-                        if (! match) {
+                        if (!match) {
                             continue;
                         }
                     }
@@ -288,7 +289,7 @@ public class ClassUtils {
             throw e;
         }
     }
-    
+
     public static String getInitCode(Class<?> type) {
         if (byte.class.equals(type)
                 || short.class.equals(type)
@@ -305,7 +306,7 @@ public class ClassUtils {
             return "null";
         }
     }
-    
+
     public static <K, V> Map<K, V> toMap(Map.Entry<K, V>[] entries) {
         Map<K, V> map = new HashMap<K, V>();
         if (entries != null && entries.length > 0) {
@@ -316,6 +317,7 @@ public class ClassUtils {
         return map;
     }
 
-    private ClassUtils() {}
+    private ClassUtils() {
+    }
 
 }

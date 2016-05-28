@@ -14,46 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dlmu.bat.common.conf;
+package com.dlmu.bat.plugin.conf.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * This is an implementation of HTraceConfiguration which draws its properties
  * from global Java Properties.
  */
-public final class JavaPropertyConfiguration extends DTraceConfiguration {
-    private static final Logger LOG =
-            LoggerFactory.getLogger(JavaPropertyConfiguration.class);
+public final class JavaPropertyConfiguration extends AbstractConfiguration {
 
-    public static class Builder {
-        final LinkedList<String> prefixes;
+    private static final Logger logger = LoggerFactory.getLogger(JavaPropertyConfiguration.class);
 
-        public Builder() {
-            prefixes = new LinkedList<String>();
-            prefixes.add("htrace.");
-        }
+    private String[] prefixes;
 
-        public Builder clearPrefixes() {
-            prefixes.clear();
-            return this;
-        }
-
-        public Builder addPrefix(String prefix) {
-            prefixes.add(prefix);
-            return this;
-        }
-
-        JavaPropertyConfiguration build() {
-            return new JavaPropertyConfiguration(prefixes);
-        }
+    public JavaPropertyConfiguration() {
+        prefixes = new String[]{""};
     }
-
-    private final String[] prefixes;
 
     private JavaPropertyConfiguration(LinkedList<String> prefixes) {
         this.prefixes = new String[prefixes.size()];
@@ -61,6 +41,42 @@ public final class JavaPropertyConfiguration extends DTraceConfiguration {
         for (Iterator<String> it = prefixes.descendingIterator(); it.hasNext(); ) {
             this.prefixes[i++] = it.next();
         }
+    }
+
+    @Override
+    public void put(String key, String value) {
+        for (String prefix : prefixes) {
+            if (key.startsWith(prefix)) {
+                System.setProperty(key.substring(prefix.length()), value);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public int index() {
+        return 299;
+    }
+
+    /**
+     * Returns an iterator over elements of type {@code T}.
+     *
+     * @return an Iterator.
+     */
+    @Override
+    public Iterator<Map.Entry<String, String>> iterator() {
+        Map<String, String> result = new HashMap<String, String>();
+        Properties properties = System.getProperties();
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            String key = String.valueOf(entry.getKey());
+            for (String prefix : prefixes) {
+                if (key.startsWith(prefix)) {
+                    result.put(key.substring(prefix.length()), String.valueOf(entry.getValue()));
+                    break;
+                }
+            }
+        }
+        return result.entrySet().iterator();
     }
 
     @Override

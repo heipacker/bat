@@ -255,7 +255,7 @@ class TraceMethodVisitor extends MethodVisitor implements Opcodes {
         // TraceScope scope = client.newScope(method.getSignature(), traceInfo);
         traceMethod.visitLdcInsn(method.getDescription());
         traceMethod.visitFieldInsn(GETSTATIC, "com/dlmu/bat/client/TraceUtils", "NEW_NO_TRACE", "Lcom/dlmu/bat/client/TraceInfo;");
-        traceMethod.visitMethodInsn(INVOKEVIRTUAL, "com/dlmu/bat/client/DTraceClient", "newScope", "(Ljava/lang/String;Lcom/dlmu/bat/client/TraceInfo;)Lcom/dlmu/bat/client/TraceScope;", false);
+        traceMethod.visitMethodInsn(INVOKEINTERFACE, "com/dlmu/bat/client/DTraceClient", "newScope", "(Ljava/lang/String;Lcom/dlmu/bat/client/TraceInfo;)Lcom/dlmu/bat/client/TraceScope;", true);
         //store scope to local variable
         traceMethod.visitVarInsn(ASTORE, scopeVarIndex);
 

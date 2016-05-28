@@ -5,7 +5,6 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 /**

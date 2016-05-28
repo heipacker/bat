@@ -20,6 +20,7 @@ import io.netty.util.internal.OneTimeTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> 交互类型。
  * @author heipacker
  */
-public abstract class NettyClient<T> {
+public abstract class NettyClient<T> implements Closeable {
 
     private static Logger log = LoggerFactory.getLogger(NettyClient.class);
 
@@ -121,6 +122,12 @@ public abstract class NettyClient<T> {
             }
         }
 
+        /**
+         * 先写一个标志为 OTHER_TYPE, 然后将message序列化到buf中
+         *
+         * @param buf
+         * @param message
+         */
         private void encode(ByteBuf buf, T message) {
             try {
                 buf.writeByte(Serializers.OTHER_TYPE);

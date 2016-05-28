@@ -53,9 +53,7 @@ public class NettyServer {
         bootstrap.channel(NioServerSocketChannel.class);
 
         final ExpiredHandler expiredHandler = new ExpiredHandler();
-
         final ProcessHandler processHandler = new ProcessHandler();
-
         bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
@@ -100,7 +98,7 @@ public class NettyServer {
     /**
      * 处理器。
      *
-     * @author tianpeng.li
+     * @author heipacker
      */
     public static interface Processor {
 
@@ -112,7 +110,7 @@ public class NettyServer {
      * 解码处理器。
      *
      * @param <T> 解码类型。
-     * @author tianpeng.li
+     * @author heipacker
      */
     public static abstract class DecoderProcess<T> implements Processor {
 
@@ -204,7 +202,6 @@ public class NettyServer {
                     processor.process(data, remoteInfo);
                 }
                 postProcessDecode(data.length, remoteInfo);    // 不考虑本身异常。
-
             } catch (Throwable e) {
                 // 业务端未采用客户端调用，传输的字节码才有问题
                 logger.error("解析数据失败, 客户端IP: {}, 信息: {}", ctx.channel().remoteAddress(), e.getMessage(), e);

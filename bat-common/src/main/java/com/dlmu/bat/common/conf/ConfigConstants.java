@@ -18,4 +18,21 @@ public class ConfigConstants {
 
     public static final String DEFAULT_RECEIVER_LOAD_BALANCE = "com.dlmu.bat.common.loadbalance.impl.ConsistentHashLoadBalance";
 
+    public static final String SAMPLER_CLASS_KEY = "bat.samper.class";
+
+    public static final String OVERRIDE_SAMPLE_ENABLED_KEY = "bat.override.sample.enabled";
+
+    public static final boolean DEFAULT_OVERRIDE_SAMPLE_ENABLED = false;
+
+    public static final String CLIENT_SEND_RETRIES_KEY = "bat.client.retries";
+
+    public static final String RECEIVER_TYPE_KEY = "bat.receiver.type";
+
+    public static final String ZK_ADDRESS_KEY = "bat.zk.address";
+
+    public static final String DEFAULT_ZK_ADDRESS = "localhost:2181";
+
+    public static final String SERVER_PORT_KEY = "bat.server.port";
+
+    public static final int DEFAULT_SERVER_PORT = 7079;
 }

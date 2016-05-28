@@ -17,15 +17,8 @@
 package com.dlmu.bat.client;
 
 import com.dlmu.bat.common.TimelineAnnotation;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +88,7 @@ public interface Span {
     Span child(String description);
 
     String getChildNextId();
+
     /**
      * Add a data annotation associated with this span
      *

@@ -1,8 +1,14 @@
 package com.dlmu.bat.server;
 
+import com.dlmu.bat.common.conf.ConfigConstants;
+import com.dlmu.bat.common.netty.NettyServer;
+import com.dlmu.bat.plugin.conf.Configuration;
+import com.google.common.base.Throwables;
+import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,10 +26,12 @@ public class BatServer {
 
     private CountDownLatch shutdownLatch = new CountDownLatch(1);
 
-    private ServerConfig serverConfig;
+    private Configuration configuration;
 
-    public BatServer(ServerConfig serverConfig) {
-        this.serverConfig = serverConfig;
+    private SpanNettyServer spanNettyServer;
+
+    public BatServer(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     public void startup() {
@@ -38,13 +46,22 @@ public class BatServer {
 
             boolean canStartup = isStartingUp.compareAndSet(false, true);
             if (canStartup) {
-                //todo add startup code
+                ZkClient zkClient = new ZkClient(configuration.get(ConfigConstants.ZK_ADDRESS_KEY, ConfigConstants.DEFAULT_ZK_ADDRESS));
+                NettyServer.Processor processor = new NettyServer.Processor() {
+                    @Override
+                    public void process(byte[] sources, String remoteInfo) {
+
+                    }
+                };
+                int port = configuration.getInt(ConfigConstants.SERVER_PORT_KEY, ConfigConstants.DEFAULT_SERVER_PORT);
+                this.spanNettyServer = new SpanNettyServer(zkClient, Collections.singletonList(processor), port);
+                this.spanNettyServer.init();
             }
         } catch (Throwable e) {
             logger.error("Fatal error during KafkaServer startup. Prepare to shutdown", e);
             isStartingUp.set(false);
             shutdown();
-            throw e;
+            throw Throwables.propagate(e);
         }
     }
 
@@ -57,10 +74,11 @@ public class BatServer {
 
             boolean canShutdown = isShuttingDown.compareAndSet(false, true);
             if (canShutdown && shutdownLatch.getCount() > 0) {
-                //todo add shutdown code
+                this.spanNettyServer.destroy();
             }
         } catch (Throwable e) {
-
+            logger.error("shut down error", e);
+            throw Throwables.propagate(e);
         }
     }
 

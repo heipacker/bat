@@ -35,6 +35,6 @@ public class BaseSpan implements InvokerContext {
     }
 
     public void write(OutputStream os) {
-        
+
     }
 }

@@ -32,4 +32,11 @@ public class Constants {
 
     public static final String NO_NEW_TRACEID = "NO_NEW_TRACEID";
 
+
+    //traceInfo
+    public static final String DTRACE_TNAME = "tname";
+    public static final String DTRACE_LOCAL_HOSTADDRESS = "T_LOCAL_HOSTADDRESS";
+    public static final String DTRACE_LOCAL_HOSTNAME = "T_LOCAL_HOSTNAME";
+
+
 }

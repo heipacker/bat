@@ -4,14 +4,11 @@ import com.dlmu.bat.common.Constants;
 import com.dlmu.bat.common.NetUtil;
 import com.dlmu.bat.common.metric.Metrics;
 import com.dlmu.bat.common.netty.NettyServer;
-import com.dlmu.bat.common.register.RegistryUtils;
-import com.dlmu.bat.server.zk.ConnectionState;
-import com.dlmu.bat.server.zk.ConnectionStateListener;
-import com.dlmu.bat.server.zk.ZKClient;
-import com.dlmu.bat.server.zk.ZKClientCache;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import org.apache.curator.utils.ZKPaths;
+import org.I0Itec.zkclient.IZkStateListener;
+import org.I0Itec.zkclient.ZkClient;
+import org.apache.zookeeper.Watcher;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SpanNettyServer extends NettyServer {
 
-    private final ZKClient zkClient;
+    private final ZkClient zkClient;
 
     private final int bindPort;
 
@@ -32,9 +29,9 @@ public class SpanNettyServer extends NettyServer {
 
     private volatile Future<Void> future;
 
-    public SpanNettyServer(List<NettyServer.Processor> processors, int bindPort) {
+    public SpanNettyServer(ZkClient zkClient, List<NettyServer.Processor> processors, int bindPort) {
         super(1, Runtime.getRuntime().availableProcessors(), processors.toArray(new Processor[processors.size()]));
-        this.zkClient = ZKClientCache.get(RegistryUtils.resolve());
+        this.zkClient = zkClient;
         this.bindPort = bindPort;
     }
 
@@ -44,6 +41,7 @@ public class SpanNettyServer extends NettyServer {
             public void operationComplete(Future<Void> future) throws Exception {
                 logger.info("Server 启动成功");
                 SpanNettyServer.this.future = future;
+                register();
             }
         });
     }
@@ -51,7 +49,7 @@ public class SpanNettyServer extends NettyServer {
     @Override
     public void destroy() throws Exception {
         if (node != null) {
-            zkClient.deletePath(node);
+            zkClient.delete(node);
         }
         zkClient.close();
         super.destroy();
@@ -59,31 +57,39 @@ public class SpanNettyServer extends NettyServer {
 
     private void register() {
         doRegister();
-        zkClient.addConnectionChangeListenter(new ConnectionStateListener() {
+        zkClient.subscribeStateChanges(new IZkStateListener() {
             @Override
-            public void stateChanged(ZKClient sender, ConnectionState state) {
-                if (state == ConnectionState.RECONNECTED) {
-                    doRegister();
-                }
+            public void handleStateChanged(Watcher.Event.KeeperState state) throws Exception {
+                logger.warn("state change to {}", state);
+            }
+
+            @Override
+            public void handleNewSession() throws Exception {
+                doRegister();
+            }
+
+            @Override
+            public void handleSessionEstablishmentError(Throwable error) throws Exception {
+                logger.error("handleSessionEstablishmentError", error);
             }
         });
     }
 
     private void doRegister() {
         try {
-            if (!zkClient.checkExist(Constants.SERVER_ROOT)) {
-                zkClient.addPersistentNode(Constants.SERVER_ROOT);
+            if (!zkClient.exists(Constants.SERVER_ROOT)) {
+                zkClient.createPersistent(Constants.SERVER_ROOT);
             }
             String node = NetUtil.getLocalAddress().getHostAddress() + ":" + bindPort;
-            node = ZKPaths.makePath(Constants.SERVER_ROOT, node);
-            if (zkClient.checkExist(node)) {
+            node = ZKUtils.makePath(Constants.SERVER_ROOT, node);
+            if (zkClient.exists(node)) {
                 try {
-                    zkClient.deletePath(node);
+                    zkClient.delete(node);
                 } catch (Exception e) {
                     // ignore
                 }
             }
-            zkClient.addEphemeralNode(node);
+            zkClient.createEphemeral(node);
             this.node = node;
             logger.info("ZK 注册成功, node {}", node);
         } catch (Exception e) {

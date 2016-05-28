@@ -43,7 +43,7 @@ public class TraceMethod {
             String argDesc = args.get(i).desc;
             builder.append(argDesc);
         }
-        
+
         builder.append(")");
         this.desc = builder.toString();
     }

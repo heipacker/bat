@@ -17,7 +17,7 @@
 package com.dlmu.bat.client.receiver;
 
 import com.dlmu.bat.common.BaseSpan;
-import com.dlmu.bat.common.conf.DTraceConfiguration;
+import com.dlmu.bat.plugin.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
 public class StandardOutSpanReceiver extends SpanReceiver {
     private static final Logger logger = LoggerFactory.getLogger(StandardOutSpanReceiver.class);
 
-    public StandardOutSpanReceiver(DTraceConfiguration conf) {
+    public StandardOutSpanReceiver(Configuration conf) {
         logger.trace("Created new StandardOutSpanReceiver.");
     }
 

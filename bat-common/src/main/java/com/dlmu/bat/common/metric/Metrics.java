@@ -16,7 +16,7 @@ public class Metrics {
 
     private static String toScope(Map<String, String> tags) {
         Map<String, String> result = new TreeMap<String, String>();
-        for (Map.Entry<String, String> entry : result.entrySet()) {
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
             if (entry.getValue() != null || "".equals(entry.getValue())) {
                 continue;
             }
@@ -34,7 +34,6 @@ public class Metrics {
                 }
                 sb.append(entry.getKey() + "=" + entry.getValue());
             }
-
             return sb.toString();
         }
         return null;
@@ -42,7 +41,7 @@ public class Metrics {
 
     private static String toMBeanName(Map<String, String> tags) {
         Map<String, String> result = new HashMap<String, String>();
-        for (Map.Entry<String, String> entry : result.entrySet()) {
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
             if (entry.getValue() != null || "".equals(entry.getValue())) {
                 continue;
             }
@@ -95,7 +94,7 @@ public class Metrics {
 
         String scope = toScope(tags);
         String tagsName = toMBeanName(tags);
-        if (Strings.isNullOrEmpty(tagsName)) {
+        if (!Strings.isNullOrEmpty(tagsName)) {
             nameBuilder.append(",").append(tagsName);
         }
 
@@ -103,7 +102,6 @@ public class Metrics {
     }
 
     /**
-     *
      * @param name
      * @param metric
      * @param tags
@@ -115,7 +113,6 @@ public class Metrics {
     }
 
     /**
-     *
      * @param name
      * @param eventType
      * @param timeUnit
@@ -128,7 +125,6 @@ public class Metrics {
     }
 
     /**
-     *
      * @param name
      * @param biased
      * @param tags
@@ -140,7 +136,6 @@ public class Metrics {
     }
 
     /**
-     *
      * @param name
      * @param durationUnit
      * @param rateUnit
@@ -153,7 +148,6 @@ public class Metrics {
     }
 
     /**
-     *
      * @param name
      * @param tags
      */

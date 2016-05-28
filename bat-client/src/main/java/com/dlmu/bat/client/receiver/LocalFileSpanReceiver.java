@@ -17,8 +17,8 @@
 package com.dlmu.bat.client.receiver;
 
 import com.dlmu.bat.common.BaseSpan;
-import com.dlmu.bat.common.conf.DTraceConfiguration;
 import com.dlmu.bat.common.metric.Metrics;
+import com.dlmu.bat.plugin.conf.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -53,7 +53,7 @@ public class LocalFileSpanReceiver extends SpanReceiver {
     private final FileChannel channel;
     private final ReentrantLock channelLock = new ReentrantLock();
 
-    public LocalFileSpanReceiver(DTraceConfiguration conf) {
+    public LocalFileSpanReceiver(Configuration conf) {
         int capacity = conf.getInt(CAPACITY_KEY, CAPACITY_DEFAULT);
         if (capacity < 1) {
             throw new IllegalArgumentException(CAPACITY_KEY + " must not be " +

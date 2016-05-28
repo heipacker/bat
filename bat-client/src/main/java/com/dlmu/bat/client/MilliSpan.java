@@ -17,7 +17,10 @@
 package com.dlmu.bat.client;
 
 import com.dlmu.bat.common.BaseSpan;
+import com.dlmu.bat.common.Constants;
+import com.dlmu.bat.common.NetUtil;
 import com.dlmu.bat.common.TimelineAnnotation;
+import com.dlmu.bat.common.tname.Utils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
@@ -41,6 +44,17 @@ public class MilliSpan extends BaseSpan implements Span {
         this.traceInfo = null;
         this.timeline = null;
     }
+
+    public MilliSpan(String description, String traceId, String spanId, Map<String, String> traceContext) {
+        super(description, traceId, spanId);
+        this.traceContext = traceContext;
+        this.start = currentTimeMillis();
+        this.stop = 0;
+        addKVAnnotation(Constants.DTRACE_TNAME, Utils.getTName());
+        addKVAnnotation(Constants.DTRACE_LOCAL_HOSTADDRESS, NetUtil.getLocalAddress().getHostAddress());
+        addKVAnnotation(Constants.DTRACE_LOCAL_HOSTNAME, NetUtil.getLocalAddress().getHostName());
+    }
+
 
     private String generateNextChildSpanId() {
         return this.spanId + "." + index.incrementAndGet();

@@ -1,5 +1,7 @@
 package com.dlmu.bat.server;
 
+import com.dlmu.bat.plugin.conf.Configuration;
+import com.dlmu.bat.plugin.conf.impl.AbstractConfiguration;
 import com.google.common.base.Joiner;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -29,7 +31,7 @@ public class Bat {
             CommandLineUtils.printUsageAndDie(optionParser, "USAGE: java [options] %s server.properties [--override property=value]*".format(Bat.class.getSimpleName()));
         }
 
-        Properties props = Utils.loadProps(args[0]);
+        Properties props = PropertiesUtils.loadProps(args[0]);
         if (args.length > 1) {
             OptionSet options = optionParser.parse(Arrays.copyOfRange(args, 1, args.length));
             if (options.nonOptionArguments().size() > 0) {
@@ -43,7 +45,9 @@ public class Bat {
     public static void main(String[] args) {
         try {
             final Properties serverProps = getPropsFromArgs(args);
-            final BatServerStartable batServerStartable = BatServerStartable.fromProps(serverProps);
+            Configuration configuration = AbstractConfiguration.getConfiguration();
+            configuration.putAll(serverProps);
+            final BatServerStartable batServerStartable = BatServerStartable.fromConfig(configuration);
 
             // attach shutdown handler to catch control-c
             Runtime.getRuntime().addShutdownHook(new Thread() {

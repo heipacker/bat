@@ -18,7 +18,6 @@ package com.dlmu.bat.client;
 
 
 import com.dlmu.bat.client.receiver.SpanReceiver;
-import com.dlmu.bat.common.conf.DTraceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,37 +218,6 @@ public class TracerPool {
         }
     }
 
-    /**
-     * Given a SpanReceiver class name, return the existing instance of that span
-     * receiver, if possible; otherwise, invoke the callable to create a new
-     * instance.
-     *
-     * @param className   The span receiver class name.
-     * @param conf        The HTrace configuration.
-     * @param classLoader The class loader to use.
-     * @return The SpanReceiver.
-     */
-    public synchronized SpanReceiver loadReceiverType(String className,
-                                                      DTraceConfiguration conf, ClassLoader classLoader) {
-        String receiverClass = className.contains(".") ?
-                className : SpanReceiver.Builder.DEFAULT_PACKAGE + "." + className;
-        SpanReceiver[] receivers = curReceivers;
-        for (SpanReceiver receiver : receivers) {
-            if (receiver.getClass().getName().equals(receiverClass)) {
-                logger.trace(toString() + ": returning a reference to receiver " +
-                        receiver.toString());
-                return receiver;
-            }
-        }
-        logger.trace(toString() + ": creating a new SpanReceiver of type " +
-                className);
-        SpanReceiver receiver = new SpanReceiver.Builder(conf).
-                className(className).
-                classLoader(classLoader).
-                build();
-        addReceiver(receiver);
-        return receiver;
-    }
 
     /**
      * Returns an array of all the current Tracers.

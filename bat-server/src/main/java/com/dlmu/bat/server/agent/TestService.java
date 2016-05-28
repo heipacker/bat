@@ -26,7 +26,7 @@ public class TestService {
 
     @DTrace
     public String sayHelloTwoArgOneReturn(String name1, String name2) {
-        System.out.println(name1  + ":" + name2);
+        System.out.println(name1 + ":" + name2);
         return "sayHelloTwoArgOneReturn";
     }
 

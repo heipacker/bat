@@ -11,14 +11,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- *
- * @author heipacker
  * @param <T>
+ * @author heipacker
  */
 public class ConsistentHashLoadBalance<T extends Node> extends AbstractLoadBalance<T> {
 
-	private volatile ConsistentHashSelector<?> selector;
-	
+    private volatile ConsistentHashSelector<?> selector;
+
     private static final ThreadLocal<MessageDigest> MD5_THREADLOCAL = new ThreadLocal<MessageDigest>() {
         @Override
         protected MessageDigest initialValue() {
@@ -29,20 +28,20 @@ public class ConsistentHashLoadBalance<T extends Node> extends AbstractLoadBalan
             }
         }
     };
-	
-	@Override
-	public T doSelect(List<?> sources, InvokerContext context) {
-		 int identityHashCode = System.identityHashCode(sources);
-	     if (selector == null || selector.getIdentityHashCode() != identityHashCode) {
-	            selector = new ConsistentHashSelector<T>((List<T>) sources, identityHashCode, 160);
-	     }
-	     return (T) selector.select(context);
-	}
-	
-	private static final class ConsistentHashSelector<T extends Node> {
+
+    @Override
+    public T doSelect(List<?> sources, InvokerContext context) {
+        int identityHashCode = System.identityHashCode(sources);
+        if (selector == null || selector.getIdentityHashCode() != identityHashCode) {
+            selector = new ConsistentHashSelector<T>((List<T>) sources, identityHashCode, 160);
+        }
+        return (T) selector.select(context);
+    }
+
+    private static final class ConsistentHashSelector<T extends Node> {
 
         private final TreeMap<Long, T> virtualSources;
-        
+
         private final int identityHashCode;
 
         public ConsistentHashSelector(List<T> sources, int identityHashCode, int hashNodes) {
@@ -88,7 +87,7 @@ public class ConsistentHashLoadBalance<T extends Node> extends AbstractLoadBalan
         private long hash(byte[] digest, int number) {
             return (((long) (digest[3 + number * 4] & 0xFF) << 24)
                     | ((long) (digest[2 + number * 4] & 0xFF) << 16)
-                    | ((long) (digest[1 + number * 4] & 0xFF) << 8) 
+                    | ((long) (digest[1 + number * 4] & 0xFF) << 8)
                     | (digest[(number * 4)] & 0xFF))
                     & 0xFFFFFFFFL;
         }
