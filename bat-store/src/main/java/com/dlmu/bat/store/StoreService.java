@@ -1,6 +1,9 @@
 package com.dlmu.bat.store;
 
 import com.dlmu.bat.common.BaseSpan;
+import com.stumbleupon.async.Deferred;
+
+import java.util.List;
 
 /**
  * @author heipacker
@@ -8,5 +11,18 @@ import com.dlmu.bat.common.BaseSpan;
  */
 public interface StoreService<T extends BaseSpan> {
 
-    void storeSpan(T baseSpan);
+    Deferred<Object> storeSpan(T baseSpan);
+
+    /**
+     * @param traceId
+     * @return
+     */
+    Deferred<List<T>> getChildrenSpans(String traceId);
+
+    /**
+     * @param traceId
+     * @param parentSpanId
+     * @return
+     */
+    Deferred<List<T>> getChildrenSpans(final String traceId, final String parentSpanId);
 }

@@ -54,14 +54,14 @@ public class HBaseStoreServiceImpl implements StoreService<HBaseBaseSpan> {
     }
 
     @Override
-    public void storeSpan(HBaseBaseSpan baseSpan) {
+    public Deferred<Object> storeSpan(HBaseBaseSpan baseSpan) {
         byte[] rowKey = ascii2byte(baseSpan.rowKey());
         byte[] qualifier = ascii2byte(baseSpan.qualifier());
         PutRequest put = new PutRequest(table, rowKey, family, qualifier, baseSpan.toBytes());
         put.setDurable(false);//todo 可以修改 视情况而定
 
         final TimerContext context = Metrics.newTimer("storeSpanTimer", ImmutableMap.of("", "")).time();
-        hBaseClient.put(put).addBoth(new Callback<Object, Object>() {
+        return hBaseClient.put(put).addBoth(new Callback<Object, Object>() {
 
             @Override
             public Object call(Object arg) throws Exception {

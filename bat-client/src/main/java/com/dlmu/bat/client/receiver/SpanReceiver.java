@@ -29,10 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * The collector within a process that is the destination of Spans when a
  * trace is running. {@code SpanReceiver} implementations are expected to
  * provide a constructor with the signature
- * <p>
- * <pre>
- * <code>public SpanReceiverImpl(HTraceConfiguration)</code>
- * </pre>
  */
 public abstract class SpanReceiver implements Closeable {
     /**

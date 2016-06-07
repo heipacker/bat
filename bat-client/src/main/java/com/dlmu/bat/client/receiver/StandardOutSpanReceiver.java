@@ -27,10 +27,11 @@ import java.io.IOException;
  * Used for testing. Simply prints to standard out any spans it receives.
  */
 public class StandardOutSpanReceiver extends SpanReceiver {
+
     private static final Logger logger = LoggerFactory.getLogger(StandardOutSpanReceiver.class);
 
     public StandardOutSpanReceiver(Configuration conf) {
-        logger.trace("Created new StandardOutSpanReceiver.");
+        logger.debug("Created new StandardOutSpanReceiver.");
     }
 
     @Override

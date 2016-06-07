@@ -1,0 +1,1 @@
+create 'battrace', {NAME => 'b', COMPRESSION => 'SNAPPY'}
