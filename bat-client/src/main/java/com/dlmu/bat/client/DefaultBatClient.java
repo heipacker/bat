@@ -176,6 +176,16 @@ class DefaultBatClient implements BatClient {
     }
 
     /**
+     * @param span Span
+     * @return the new trace scope
+     */
+    @Override
+    public TraceScope newScope(Span span) {
+        Preconditions.checkNotNull(span);
+        return new DefaultTraceScope(this, span, null);
+    }
+
+    /**
      * Return a null trace scope.
      *
      * @return The null trace scope.

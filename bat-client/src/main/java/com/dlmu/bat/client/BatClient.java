@@ -35,6 +35,13 @@ public interface BatClient extends Closeable {
     TraceScope newScope(String description, String traceId, String spanId, Map<String, String> traceContext);
 
     /**
+     *
+     * @param span Span
+     * @return the new trace scope
+     */
+    TraceScope newScope(Span span);
+
+    /**
      * get current trace id
      *
      * @return
