@@ -33,17 +33,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.dlmu.bat.common.conf.ConfigConstants.*;
 
 /**
  * Writes the spans it receives to a local file.
  */
 public class LocalFileSpanReceiver extends SpanReceiver {
+
     private static final Logger logger = LoggerFactory.getLogger(LocalFileSpanReceiver.class);
-    public static final String PATH_KEY = "local.file.span.receiver.path";
-    public static final String CAPACITY_KEY = "local.file.span.receiver.capacity";
-    public static final int CAPACITY_DEFAULT = 5000;
+
     private static ObjectWriter JSON_WRITER = new ObjectMapper().writer();
     private final String path;
 
@@ -51,33 +51,32 @@ public class LocalFileSpanReceiver extends SpanReceiver {
     private int bufferedSpansIndex;
     private final ReentrantLock bufferLock = new ReentrantLock();
 
-    private final FileOutputStream stream;
+    private final FileOutputStream fileOutputStream;
     private final FileChannel channel;
     private final ReentrantLock channelLock = new ReentrantLock();
 
     public LocalFileSpanReceiver(Configuration configuration) {
-        int capacity = configuration.getInt(CAPACITY_KEY, CAPACITY_DEFAULT);
+        int capacity = configuration.getInt(RECEIVER_CAPACITY_KEY, DEFAULT_RECEIVER_CAPACITY);
         if (capacity < 1) {
-            throw new IllegalArgumentException(CAPACITY_KEY + " must not be " +
-                    "less than 1.");
+            throw new IllegalArgumentException(RECEIVER_CAPACITY_KEY + " must not be less than 1.");
         }
-        String pathStr = configuration.get(PATH_KEY);
+        String pathStr = configuration.get(RECEIVER_LOCAL_FILE_PATH_KEY);
         if (pathStr == null || pathStr.isEmpty()) {
-            path = getUniqueLocalTraceFileName();
+            path = getLocalTraceFileName();
         } else {
             path = pathStr;
         }
         boolean success = false;
         try {
-            this.stream = new FileOutputStream(path, true);
+            this.fileOutputStream = new FileOutputStream(path, true);
         } catch (IOException ioe) {
             logger.error("Error opening " + path + ": " + ioe.getMessage());
             throw new RuntimeException(ioe);
         }
-        this.channel = stream.getChannel();
+        this.channel = fileOutputStream.getChannel();
         if (this.channel == null) {
             try {
-                this.stream.close();
+                this.fileOutputStream.close();
             } catch (IOException e) {
                 logger.error("Error closing " + path, e);
             }
@@ -87,8 +86,7 @@ public class LocalFileSpanReceiver extends SpanReceiver {
         this.bufferedSpans = new byte[capacity][];
         this.bufferedSpansIndex = 0;
         if (logger.isDebugEnabled()) {
-            logger.debug("Created new LocalFileSpanReceiver with path = " + path +
-                    ", capacity = " + capacity);
+            logger.debug("Created new LocalFileSpanReceiver with path = " + path + ", capacity = " + capacity);
         }
     }
 
@@ -102,8 +100,7 @@ public class LocalFileSpanReceiver extends SpanReceiver {
      */
     private final int WRITEV_SIZE = 20;
 
-    private final static ByteBuffer newlineBuf =
-            ByteBuffer.wrap(new byte[]{(byte) 0xa});
+    private final static ByteBuffer newlineBuf = ByteBuffer.wrap(new byte[]{(byte) 0xa});
 
     /**
      * Flushes a bufferedSpans array.
@@ -134,25 +131,21 @@ public class LocalFileSpanReceiver extends SpanReceiver {
     public void receiveSpan(BaseSpan span) {
         TimerContext context = Metrics.newTimer("receiveSpanTimer", Collections.<String, String>emptyMap()).time();
         try {
-            // Serialize the span data into a byte[].  Note that we're not holding the
-            // lock here, to improve concurrency.
+            // Serialize the span data into a byte[].  Note that we're not holding the lock here, to improve concurrency.
             byte jsonBuf[] = null;
             try {
                 jsonBuf = JSON_WRITER.writeValueAsBytes(span);
             } catch (JsonProcessingException e) {
-                logger.error("receiveSpan(path=" + path + ", span=" + span + "): " +
-                        "Json processing error: " + e.getMessage());
+                logger.error("receiveSpan(path=" + path + ", span=" + span + "): Json processing error: " + e.getMessage());
                 return;
             }
 
-            // Grab the bufferLock and put our jsonBuf into the list of buffers to
-            // flush.
+            // Grab the bufferLock and put our jsonBuf into the list of buffers to flush.
             byte toFlush[][] = null;
             bufferLock.lock();
             try {
                 if (bufferedSpans == null) {
-                    logger.debug("receiveSpan(path=" + path + ", span=" + span + "): " +
-                            "LocalFileSpanReceiver for " + path + " is closed.");
+                    logger.debug("receiveSpan(path=" + path + ", span=" + span + "): LocalFileSpanReceiver for " + path + " is closed.");
                     return;
                 }
                 bufferedSpans[bufferedSpansIndex] = jsonBuf;
@@ -181,8 +174,7 @@ public class LocalFileSpanReceiver extends SpanReceiver {
                 try {
                     doFlush(toFlush, toFlush.length);
                 } catch (IOException ioe) {
-                    logger.error("Error flushing buffers to " + path + ": " +
-                            ioe.getMessage());
+                    logger.error("Error flushing buffers to " + path + ": " + ioe.getMessage());
                 } finally {
                     channelLock.unlock();
                 }
@@ -213,19 +205,18 @@ public class LocalFileSpanReceiver extends SpanReceiver {
         try {
             doFlush(toFlush, numToFlush);
         } catch (IOException ioe) {
-            logger.error("Error flushing buffers to " + path + ": " +
-                    ioe.getMessage());
+            logger.error("Error flushing buffers to " + path + ": " + ioe.getMessage());
         } finally {
             try {
-                stream.close();
+                fileOutputStream.close();
             } catch (IOException e) {
-                logger.error("Error closing stream for " + path, e);
+                logger.error("Error closing fileOutputStream for " + path, e);
             }
             channelLock.unlock();
         }
     }
 
-    private String getUniqueLocalTraceFileName() {
+    private String getLocalTraceFileName() {
         String logDir = null;
         String basePath = System.getProperty("catalina.base");
         if (basePath != null) {

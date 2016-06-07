@@ -28,6 +28,12 @@ public class ConfigConstants {
 
     public static final String RECEIVER_TYPE_KEY = "bat.receiver.type";
 
+    public static final String RECEIVER_CAPACITY_KEY = "bat.span.receiver.capacity";
+
+    public static final int DEFAULT_RECEIVER_CAPACITY = 5000;
+
+    public static final String RECEIVER_LOCAL_FILE_PATH_KEY = "local.file.span.receiver.path";
+
     public static final String ZK_ADDRESS_KEY = "bat.zk.address";
 
     public static final String DEFAULT_ZK_ADDRESS = "localhost:2181";

@@ -34,7 +34,6 @@ public class HBaseStoreServiceImpl implements StoreService<HBaseBaseSpan> {
     private byte[] family = ascii2byte("b");
 
     /**
-     *
      * @param hBaseClient
      * @param table
      */
@@ -44,7 +43,6 @@ public class HBaseStoreServiceImpl implements StoreService<HBaseBaseSpan> {
     }
 
     /**
-     *
      * @param hBaseClient
      * @param table
      * @param family
