@@ -10,7 +10,13 @@ import java.util.Map;
  */
 public interface BatClient extends Closeable {
 
-    TraceScope newScope(String description, String traceId, String spanId, Map<String, String> traceContext);
+    /**
+     * Create a new trace scope.
+     *
+     * @param description The description of the new span to create.
+     * @return The new trace scope.
+     */
+    TraceScope newScope(String description);
 
     /**
      * @param description
@@ -20,21 +26,33 @@ public interface BatClient extends Closeable {
     TraceScope newScope(String description, TraceInfo traceInfo);
 
     /**
-     * Create a new trace scope.
-     * <p>
-     * If there are no scopes above the current scope, we will apply our
-     * configured samplers. Otherwise, we will create a trace Span only if this thread
-     * is already tracing.
-     *
-     * @param description The description of the new span to create.
-     * @return The new trace scope.
+     * @param description  一个trace的描述信息
+     * @param traceId
+     * @param spanId
+     * @param traceContext 存储一个trace链条的上下文信息
+     * @return
      */
-    TraceScope newScope(String description);
+    TraceScope newScope(String description, String traceId, String spanId, Map<String, String> traceContext);
 
+    /**
+     * get current trace id
+     *
+     * @return
+     */
     String getCurrentTraceId();
 
+    /**
+     * get next child span id of current trace id
+     *
+     * @return
+     */
     String getNextChildSpanId();
 
+    /**
+     * get current trace context of current trace
+     *
+     * @return
+     */
     ImmutableMap<String, String> getTraceContext();
 
     /**
@@ -44,8 +62,14 @@ public interface BatClient extends Closeable {
      */
     TraceScope newNullScope();
 
+    /**
+     * @return
+     */
     Span getCurrentSpan();
 
+    /**
+     * @return
+     */
     String getCurrentSpanId();
 
     void closeScope(TraceScope scope);

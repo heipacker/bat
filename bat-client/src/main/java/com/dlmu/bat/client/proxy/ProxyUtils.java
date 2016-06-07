@@ -19,11 +19,10 @@ public class ProxyUtils {
      * Returns an object that will trace all calls to itself.
      */
     @SuppressWarnings("unchecked")
-    public static <T, V> T createProxy(final T instance) {
+    public static <T> T createProxy(final T instance) {
         InvocationHandler handler = new InvocationHandler() {
             @Override
-            public Object invoke(Object obj, Method method, Object[] args)
-                    throws Throwable {
+            public Object invoke(Object obj, Method method, Object[] args) throws Throwable {
                 BatClient batClient = BatClientGetter.getClient();
                 TraceScope traceScope = batClient.newScope(method.getName());
                 try {
@@ -37,8 +36,7 @@ public class ProxyUtils {
                 }
             }
         };
-        return (T) Proxy.newProxyInstance(instance.getClass().getClassLoader(),
-                instance.getClass().getInterfaces(), handler);
+        return (T) Proxy.newProxyInstance(instance.getClass().getClassLoader(), instance.getClass().getInterfaces(), handler);
     }
 
 }

@@ -30,16 +30,16 @@ public class DefaultTraceScope implements TraceScope, Closeable {
     final BatClient batClient;
 
     /**
+     * The parentSpan of this trace scope, or null if there is no parentSpan.
+     */
+    private Span parentSpan;
+
+    /**
      * The trace span for this scope, or null if the scope is closed.
      * <p>
      * If the scope is closed, it must also be detached.
      */
     private final Span span;
-
-    /**
-     * The parentSpan of this trace scope, or null if there is no parentSpan.
-     */
-    private Span parentSpan;
 
     /**
      * True if this scope is detached.
@@ -118,8 +118,8 @@ public class DefaultTraceScope implements TraceScope, Closeable {
     }
 
     /**
-     * @param key
-     * @param value
+     * @param key String key
+     * @param value String value
      */
     public void addKVAnnotation(String key, String value) {
         span.addKVAnnotation(key, value);

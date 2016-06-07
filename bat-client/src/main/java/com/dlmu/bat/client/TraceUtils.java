@@ -8,7 +8,7 @@ public class TraceUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    {
+    static {
         objectMapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, true);
     }
 

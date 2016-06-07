@@ -1,7 +1,8 @@
 package com.dlmu.bat.common;
 
 /**
- * Created by heipacker on 16-5-18.
+ *
+ * @author heipacker on 16-5-18.
  */
 public class Constants {
 

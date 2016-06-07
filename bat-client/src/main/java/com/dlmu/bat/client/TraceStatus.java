@@ -6,9 +6,20 @@ package com.dlmu.bat.client;
  */
 public interface TraceStatus {
 
+    /**
+     * get current span
+     * @return Span
+     */
     Span getCurrentSpan();
 
-    void setCurrentSpan(Span t);
+    /**
+     * set current span
+     * @param span Span
+     */
+    void setCurrentSpan(Span span);
 
+    /**
+     * remove current span
+     */
     void remove();
 }

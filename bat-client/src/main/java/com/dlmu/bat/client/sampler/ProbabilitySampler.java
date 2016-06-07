@@ -35,11 +35,10 @@ public class ProbabilitySampler extends Sampler {
 
     public final static String SAMPLER_FRACTION_CONF_KEY = "sampler.fraction";
 
-    public ProbabilitySampler(Configuration conf) {
-        this.threshold = Double.parseDouble(conf.get(SAMPLER_FRACTION_CONF_KEY));
+    public ProbabilitySampler(Configuration configuration) {
+        this.threshold = Double.parseDouble(configuration.get(SAMPLER_FRACTION_CONF_KEY));
         if (logger.isTraceEnabled()) {
-            logger.trace("Created new ProbabilitySampler with threshold = " +
-                    threshold + ".");
+            logger.trace("Created new ProbabilitySampler with threshold = " + threshold + ".");
         }
     }
 

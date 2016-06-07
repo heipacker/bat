@@ -1,22 +1,5 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.dlmu.bat.client.concurrent;
 
-import com.dlmu.bat.client.BatClient;
 import com.dlmu.bat.client.BatClientGetter;
 import com.dlmu.bat.client.TraceScope;
 
@@ -33,16 +16,11 @@ public class TraceRunnable implements Runnable {
     private Map<String, String> traceContext;
     private Runnable runnable;
 
-    public TraceRunnable(String traceId, String spanId, Map<String, String> traceContext,
-                         Runnable runnable) {
-        this.traceId = traceId;
-        this.spanId = spanId;
-        this.traceContext = traceContext;
-        this.runnable = runnable;
+    public TraceRunnable(String traceId, String spanId, Map<String, String> traceContext, Runnable runnable) {
+        this(null, traceId, spanId, traceContext, runnable);
     }
 
-    public TraceRunnable(String description, String traceId, String spanId, Map<String, String> traceContext,
-                         Runnable runnable) {
+    public TraceRunnable(String description, String traceId, String spanId, Map<String, String> traceContext, Runnable runnable) {
         this.traceId = traceId;
         this.spanId = spanId;
         this.traceContext = traceContext;
@@ -55,12 +33,8 @@ public class TraceRunnable implements Runnable {
         if (traceId == null) {
             runnable.run();
         } else {
-            String description = this.description;
-            if (description == null) {
-                description = Thread.currentThread().getName();
-            }
-            BatClient batClient = BatClientGetter.getClient();
-            TraceScope traceScope = batClient.newScope(description, traceId, spanId, traceContext);
+            String description = this.description == null ? Thread.currentThread().getName() : this.description;
+            TraceScope traceScope = BatClientGetter.getClient().newScope(description, traceId, spanId, traceContext);
             try {
                 runnable.run();
             } finally {

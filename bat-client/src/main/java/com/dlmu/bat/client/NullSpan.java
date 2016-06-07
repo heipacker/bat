@@ -26,7 +26,11 @@ public class NullSpan extends BaseSpan implements Span {
 
     public NullSpan(String description, String traceId, String spanId, Map<String, String> traceContext) {
         this(description, traceId, spanId);
-        this.traceContext = Maps.newHashMap(traceContext);
+        if (traceContext == null) {
+            this.traceContext = Maps.newHashMap();
+        } else {
+            this.traceContext = Maps.newHashMap(traceContext);
+        }
     }
 
     /**

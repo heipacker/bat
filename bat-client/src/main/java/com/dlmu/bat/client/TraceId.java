@@ -16,11 +16,9 @@
  */
 package com.dlmu.bat.client;
 
-import com.dlmu.bat.common.Constants;
 import com.dlmu.bat.common.OSUtils;
 import com.dlmu.bat.common.tname.Utils;
 import com.dlmu.bat.plugin.conf.Configuration;
-import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +53,7 @@ public final class TraceId {
         StringBuilder sb = new StringBuilder(40);
         String ts = new Timestamp(System.currentTimeMillis()).toString();
 
-        for (int idx : codex){
+        for (int idx : codex) {
             sb.append(ts.charAt(idx));
         }
         sb.append(BAT_TRACE_UNIQUE_SPLITTER_STR).append(OSUtils.getBestIpString());
